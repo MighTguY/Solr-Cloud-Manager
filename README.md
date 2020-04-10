@@ -1,0 +1,1 @@
+# Solr-Cloud-Manager
