@@ -1,0 +1,39 @@
+server.port: 8080
+spring.jackson.time-zone: Europe/Berlin
+spring.jackson.serialization.indent_output: true
+server.servlet.context-path: '/solr-cloud-manager/api/v1/'
+management.endpoint.health.show-details: always
+info.app.name: Solr Cloud Manager
+info.app.version: 1.0.0
+management.endpoint.metrics.enabled: true
+management.health.solr.enabled: false
+management.endpoints.enabled-by-default: true
+management.security.enabled: false
+management.endpoint.prometheus.enabled: true
+management.metrics.export.prometheus.enabled: true
+spring.application.name: "Solr Cloud Manager"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+gitInfo:
+  clonepath: "/tmp/config"
+  url: "https://some-git-url.git"
+  branch: "master"
+  user: "username"
+  password: "password"
+  app: "folder-name-to-search-in-git-repo"
+
+clusters:
+  default:
+    zKChroot: /
+    zkClientTimeout: 20000
+    zkConnectTimeout: 20000
+    zkUrl: "localhost:2181"
+
+backupInfo:
+  backupSuffix: "_backup"
+  restoreSuffix: "_restore"
+  backupLocation: "/tmp/backup"
