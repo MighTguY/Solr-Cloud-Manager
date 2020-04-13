@@ -1,0 +1,74 @@
+language: java
+jdk:
+- openjdk8
+branches:
+  only:
+  - develop
+  - master
+cache:
+  directories:
+  - "~/.m2/repository"
+
+jobs:
+  include:
+  - stage: build_master
+    if: branch = master AND type = push
+    before_install:
+    - echo "Build Started for Master"
+    - export GPG_TTY=$(tty)
+    - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+    - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+    - cat /etc/hosts
+    - sudo hostname "$(hostname | cut -c1-63)"
+    - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo
+      tee /etc/hosts
+    - cat /etc/hosts
+    - mvn help:evaluate -N -Dexpression=project.version|grep -v '\[' |  cut -d'-' -f 1  |cut -d'.' -f1-2
+    - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[' | cut -d'-' -f 1 | cut -d'.' -f1-2)
+    - git config --local user.name "travis-ci"
+    - git config --local user.email "build@travis.ci"
+    - export TRAVIS_JOB_NUMBER1=${TRAVIS_JOB_NUMBER:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+    - TRAVIS_JOB_NUMBER1=$(echo $TRAVIS_JOB_NUMBER1 | cut -d'.' -f1)
+    - export NEW_VERSION=$project_version.$TRAVIS_JOB_NUMBER1
+    - mvn versions:set -DnewVersion=$NEW_VERSION
+
+    install:
+    - mvn --settings .maven.xml install -Dgpg.skip  -B -V
+
+    script:
+    - mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -Prelease
+
+    after_deploy:
+      - mvn versions:set -DnewVersion=$NEW_VERSION-SNAPSHOT
+      - sh .travis/push.sh
+
+  - stage: build_develop
+    if: branch = develop AND type = push
+    before_install:
+    - echo "Build Started for Develop"
+    - export GPG_TTY=$(tty)
+    - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+    - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+    - cat /etc/hosts
+    - sudo hostname "$(hostname | cut -c1-63)"
+    - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo
+      tee /etc/hosts
+    - cat /etc/hosts
+    install:
+    - mvn --settings .maven.xml install -Dgpg.skip  -B -V
+
+  - stage: build_pr
+    if: type = pull_request
+    before_install:
+    - echo "Build Started for PR $TRAVIS_PULL_REQUEST"
+    - export GPG_TTY=$(tty)
+    - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+    - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+    - cat /etc/hosts
+    - sudo hostname "$(hostname | cut -c1-63)"
+    - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo
+      tee /etc/hosts
+    - cat /etc/hosts
+    install:
+    - mvn --settings .maven.xml install -Dgpg.skip  -B -V
+

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration monitorInterval="60">
+  <Appenders>
+    <Console name="console-appender" target="SYSTEM_OUT">
+      <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>
+    </Console>
+    <RollingFile fileName="${sys:user.home}/log/ukgr/search-cloud-manager.log"
+      filePattern="${sys:user.home}/ukgr/search-cloud-initializer-%d{yyyy-MM-dd}.log"
+      name="rollingFile-appender">
+      <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy/>
+        <SizeBasedTriggeringPolicy size="50MB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="30"/>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="rollingFile-appender"/>
+      <AppenderRef ref="console-appender"/>
+    </Root>
+  </Loggers>
+</Configuration>
