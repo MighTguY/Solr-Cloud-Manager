@@ -57,7 +57,7 @@
     <sonar.sources>src/main/java</sonar.sources>
     <sonar.binaries>target/classes</sonar.binaries>
     <sonar.tests>src/test/java</sonar.tests>
-    <solr.version>7.6.0</solr.version>
+    <solr.version>8.5.0</solr.version>
     <swagger.version>2.9.2</swagger.version>
     <springboot.version>2.0.6.RELEASE</springboot.version>
     <build-helper.plugin.version>3.0.0</build-helper.plugin.version>
