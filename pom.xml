@@ -5,7 +5,7 @@
   <groupId>io.github.mightguy</groupId>
   <artifactId>solr-cloud-manager</artifactId>
   <packaging>pom</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
 
   <name>${project.artifactId}</name>
   <description>Solr Cloud Manager to Handle and Update Solr Cloud</description>
@@ -443,7 +443,7 @@
     <developerConnection>scm:git:ssh://github.com/mightguy/Solr-Cloud-Manager.git
     </developerConnection>
     <url>https://github.com/mightguy/Solr-Cloud-Manager/tree/master</url>
-    <tag>HEAD</tag>
+    <tag>solr-cloud-manager-1.1</tag>
   </scm>
 
 
