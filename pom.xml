@@ -442,7 +442,7 @@
 
   <scm>
     <connection>scm:git:git://github.com/mightguy/Solr-Cloud-Manager.git</connection>
-    <developerConnection>scm:git:ssh://github.com/mightguy/customized-symspell.git
+    <developerConnection>scm:git:ssh://github.com/mightguy/Solr-Cloud-Manager.git
     </developerConnection>
     <url>https://github.com/mightguy/Solr-Cloud-Manager/tree/master</url>
   </scm>
@@ -463,6 +463,17 @@
       <organizationUrl>https://github.com/MighTguY</organizationUrl>
     </developer>
   </developers>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
 
 </project>
