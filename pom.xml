@@ -65,6 +65,7 @@
 
   <modules>
     <module>solr-manager-service</module>
+    <module>vaitarna</module>
   </modules>
 
 
