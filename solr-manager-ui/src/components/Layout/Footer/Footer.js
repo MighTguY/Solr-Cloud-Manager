@@ -5,7 +5,7 @@ import { Container } from "react-bootstrap";
 class Footer extends Component {
     render() {
         return (
-            <footer className="py-4 bg-dark text-white-50">
+            <footer className="footer">
                 <Container fluid>
                    
                     <p className="copyright pull-right">
