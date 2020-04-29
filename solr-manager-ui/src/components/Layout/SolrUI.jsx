@@ -21,6 +21,8 @@ export default class SolrUI extends Component {
                         key={key}
                     />
                 );
+            } else if (prop.type === "dropdown") {
+                return this.getRoutes(prop.routes);
             } else {
                 return (<Route
                     path={prop.layout + "error"}
@@ -35,15 +37,15 @@ export default class SolrUI extends Component {
         });
     };
 
-    
+
 
     render() {
-        console.log(this.getRoutes(routes));
+        let routesArr = [].concat.apply([], this.getRoutes(routes));
         return (
             <div>
-                <NavigationBar />
-              
-                <Switch>{this.getRoutes(routes)}<Route component={ErrorComponent} /></Switch>
+                <NavigationBar {...this.props} routes={routes} />
+
+                <Switch>{routesArr}<Route component={ErrorComponent} /></Switch>
                 {/* <ClusterTable /> */}
                 <Footer />
             </div>

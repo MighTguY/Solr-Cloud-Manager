@@ -1,7 +1,11 @@
 
-.navbar-red { border-bottom: 5px solid #E64759 !important; }
+.navbar-red { border-bottom: 5px solid #E64759 !important;  }
 .navbar-yellow { border-bottom: 5px solid #E4D836 !important; }
 .navbar-green { border-bottom: 5px solid #1AC98E !important; }
 .navbar- { border-bottom: 5px solid #55595c !important; }
+.navbar-nav > .active {
+    color: black!important;  
+    font-weight: bold;
+  }
 
 
