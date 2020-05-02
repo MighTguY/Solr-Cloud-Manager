@@ -8,6 +8,7 @@ target/
 .project
 .settings
 .DS_Store
+.history
 **/target/
 generated
 
@@ -143,3 +144,4 @@ gradle/native
 .gradle
 
 clover.license
+node_modules
