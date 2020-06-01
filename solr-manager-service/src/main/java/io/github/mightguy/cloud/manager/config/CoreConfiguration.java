@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * The class {@code CoreConfiguration} is responsible to load all the SOLR related properties from
  * the solr-core.yml file
- */
+ */t
 @Configuration
 @EnableConfigurationProperties({SolrConfigruationProperties.class})
 @ComponentScan(

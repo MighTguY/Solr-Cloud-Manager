@@ -2,7 +2,7 @@ import Dashboard from "./components/Layout/Dashboard/Dashboard";
 import ZkFileViewer from "./components/Layout/Zookeeper/ZkFileViewer/ZkFileViewer";
 import ZkStatus from "./components/Layout/Zookeeper/ZkStatus/ZkStatus";
 import CloudManager from "./components/Layout/CloudManager/CloudManager";
-import Collection from "./components/Layout/Collection/Collection";
+import Collection from "./components/Layout/CollectionManager/Collection";
 import BackupManager from "./components/Layout/BackupManager/BackupManager";
 import CDCRManager from "./components/Layout/CDCRManager/CDCRManager";
 import AliasManager from "./components/Layout/AliasManager/AliasManager";

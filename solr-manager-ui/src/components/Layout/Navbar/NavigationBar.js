@@ -8,6 +8,9 @@ export default class NavigationBar extends Component {
     generateNav = (routes, isDropDown) => {
 
         return routes.map((prop, key) => {
+            if (prop.display ===  false ) {
+                return null;
+            }
             if (prop.type === "inline") {
                 if (!isDropDown) {
                     return (
@@ -47,6 +50,7 @@ export default class NavigationBar extends Component {
 
     render() {
         const RefreshropDownIcon = (<><i className="fa fa-recycle fw" /> refresh</>)
+        const ClusterIcon = (<><i className="fa fa-bolt fw" /> Clusters</>)
         var status = "";
         var a = this.generateNav(this.props.routes, false);
         console.log('a: ', a);
@@ -60,6 +64,10 @@ export default class NavigationBar extends Component {
                             {this.generateNav(this.props.routes, false)}
                         </Nav>
                         <Nav className="navbar-right">
+                        <NavDropdown title={ClusterIcon} id="basic-nav-dropdown">
+                                <NavDropdown.Item href="#action/3.1">Cluster 1</NavDropdown.Item>
+                                <NavDropdown.Item href="#action/3.2">Cluster 2</NavDropdown.Item>
+                            </NavDropdown>
                             <NavDropdown title={RefreshropDownIcon} id="basic-nav-dropdown">
                                 <NavDropdown.Item href="#action/3.1">5</NavDropdown.Item>
                                 <NavDropdown.Item href="#action/3.2">10</NavDropdown.Item>

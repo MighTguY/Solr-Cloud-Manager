@@ -8,6 +8,7 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 import Solr from '../../../assets/svg/Solr.svg'
 import { productsGenerator } from '../../tmp_utils/commons';
+import Footer from '../Footer/Footer';
 
 const Dashboard = (props) => {
 
@@ -70,25 +71,26 @@ const Dashboard = (props) => {
 
 
     return (
-        <Container fluid>
+        <Container fluid >
+            
             <Row className="justify-content-md-center">
-            <Col lg={2} sm={6}>         
-                        <StatsCard
-                            bigIcon={<i className="fa fa-object-group text-warning" />}
-                            statsText="Clusters"
-                            statsValue="1"
-                            statsIcon={<i className="fa fa-object-group" />}
-                            hintText="Number of clusters"
-                        />
+                <Col lg={2} sm={6}>
+                    <StatsCard
+                        bigIcon={<i className="fa fa-object-group text-warning" />}
+                        statsText="Clusters"
+                        statsValue="1"
+                        statsIcon={<i className="fa fa-object-group" />}
+                        hintText="Number of clusters"
+                    />
                 </Col>
-                <Col lg={2} sm={6}>         
-                        <StatsCard
-                            bigIcon={<img alt="Solr" src={Solr} className="img-fluid" />}
-                            statsText="Solr"
-                            statsValue="Version 7.7"
-                            statsIcon={<i className="fa fa-refresh" />}
-                            hintText="Solr Version of leader"
-                        />
+                <Col lg={2} sm={6}>
+                    <StatsCard
+                        bigIcon={<img alt="Solr" src={Solr} className="img-fluid" />}
+                        statsText="Solr"
+                        statsValue="Version 7.7"
+                        statsIcon={<i className="fa fa-refresh" />}
+                        hintText="Solr Version of leader"
+                    />
                 </Col>
                 <Col lg={2} sm={6}>
                     <StatsCard
@@ -118,20 +120,18 @@ const Dashboard = (props) => {
                     />
                 </Col>
             </Row>
-            <Accordion defaultActiveKey="0">
-                <Card >
-                    <Card.Header>
-                        <Accordion.Toggle as={Button} variant="link" eventKey="0"><h4 className="text-success">Solr Cluster Details <i className="fa fa-gear fw" /></h4></Accordion.Toggle>
-                    </Card.Header>
-                    <Card.Body>
-                        <Accordion.Collapse eventKey="0">
-                            <Row className="justify-content-md-center">
-                                <ClusterTable data={products} columns={columns} expandRow={expandRow} searchholder="Enter Node Name or Index Name to Filter" />
-                            </Row>
-                        </Accordion.Collapse>
-                    </Card.Body>
-                </Card>
-            </Accordion>
+
+            <Card >
+                <Card.Header>
+                   <h4 className="text-success">Solr Cluster Details <i className="fa fa-gear fw" /></h4>
+                </Card.Header>
+                <Card.Body>
+                    <Row className="justify-content-md-center">
+                        <ClusterTable data={products} columns={columns} expandRow={expandRow} searchholder="Enter Node Name or Index Name to Filter" />
+                    </Row>
+                </Card.Body>
+            </Card>
+
         </Container>
     );
 }
