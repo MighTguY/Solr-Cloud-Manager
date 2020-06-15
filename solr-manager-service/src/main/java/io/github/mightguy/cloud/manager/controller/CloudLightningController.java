@@ -1,14 +1,9 @@
-
 package io.github.mightguy.cloud.manager.controller;
 
-
-import io.github.mightguy.cloud.manager.constraints.ValidCluster;
-import io.github.mightguy.cloud.manager.constraints.ValidCollectionName;
-import io.github.mightguy.cloud.manager.constraints.ValidCollectionNameForAlias;
-import io.github.mightguy.cloud.manager.constraints.ValidValue;
 import io.github.mightguy.cloud.manager.model.InitializerConfig;
 import io.github.mightguy.cloud.manager.model.Response;
-import io.github.mightguy.cloud.manager.service.LightningService;
+import io.github.mightguy.cloud.manager.services.CloudManagerService;
+import io.github.mightguy.cloud.manager.util.Constants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -39,8 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CloudLightningController {
 
   @Autowired
-  LightningService lightningService;
-
+  CloudManagerService cloudManagerService;
 
   @ApiOperation(
       value = "API for initilaising SOLR cloud collections",
@@ -61,19 +55,11 @@ public class CloudLightningController {
   @PostMapping("/{cluster}/initialize")
   @ResponseStatus(HttpStatus.CREATED)
   public Response doInitializeSolrCloud(
-      @ValidCluster @PathVariable("cluster") String cluster,
-      @ValidValue @RequestParam(name = "git.user", required = false) String gitUser,
-      @ValidValue @RequestParam(name = "git.password", required = false) String gitPassword,
-      @ValidValue @RequestParam(name = "git.project", required = false) String gitBranch,
-      @RequestParam(name = "git-pull", required = false) boolean override,
-      @RequestParam(name = "delete_old_collections", required = false) boolean deleteOldCollections,
-      @RequestParam(name = "upload_zk_config", required = false) boolean uploadZkConf) {
+      @PathVariable("cluster") String cluster,
+      InitializerConfig initializerConfig) {
 
-    InitializerConfig initializerConfig = InitializerConfig.builder().cluster(cluster)
-        .gitUser(gitUser).gitPassword(gitPassword).folder(gitBranch).gitPull(override)
-        .deleteOldCollections(deleteOldCollections).uploadZkConf(uploadZkConf).build();
-    return lightningService
-        .initlializeCloudSolr(initializerConfig);
+    initializerConfig.setCluster(cluster);
+    return cloudManagerService.initialize(initializerConfig);
   }
 
   @ApiOperation(
@@ -95,11 +81,10 @@ public class CloudLightningController {
   @PostMapping("/{cluster}/{collection}/initialize")
   @ResponseStatus(HttpStatus.CREATED)
   public Response doInitializeSolrCollection(
-      @ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionName @PathVariable("collection") String collection,
-      @RequestBody InitializerConfig initializerConfig) {
-    return lightningService
-        .initlializeCloudSolr(initializerConfig);
+      @PathVariable("cluster") String cluster,
+      @PathVariable("collection") String collection,
+      InitializerConfig initializerConfig) {
+    return cloudManagerService.initializeCollection(initializerConfig);
   }
 
   @ApiOperation(
@@ -119,11 +104,11 @@ public class CloudLightningController {
       })
   @PutMapping("/{cluster}/reload")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Response reloadCollection(@ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionNameForAlias @RequestParam(name = "collectionName") String collectionName,
+  public Response reloadCollection(@PathVariable("cluster") String cluster,
+      @RequestParam(name = "collectionName") String collectionName,
       @RequestParam(name = "onlyShadow", required = false) boolean onlyShadowReload) {
 
-    return lightningService.reloadCollection(cluster, collectionName, onlyShadowReload);
+    return cloudManagerService.reload(cluster);
   }
 
   @ApiOperation(
@@ -142,8 +127,8 @@ public class CloudLightningController {
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
   @GetMapping("/{cluster}/collections")
-  public Response getCollections(@ValidCluster @PathVariable("cluster") String cluster) {
-    return lightningService.getCollections(cluster);
+  public Response getCollections(@PathVariable("cluster") String cluster) {
+    return cloudManagerService.getCollections(cluster);
   }
 
   @ApiOperation(
@@ -162,8 +147,8 @@ public class CloudLightningController {
       })
   @ResponseStatus(HttpStatus.ACCEPTED)
   @DeleteMapping("/{cluster}/deleteAll")
-  public Response deleteAllCollections(@ValidCluster @PathVariable("cluster") String cluster) {
-    return lightningService.deleteCollections(cluster);
+  public Response deleteAllCollections(@PathVariable("cluster") String cluster) {
+    return cloudManagerService.deleteCollection(cluster, Constants.ALL);
   }
 
 
@@ -183,11 +168,11 @@ public class CloudLightningController {
       })
   @DeleteMapping("/{cluster}/{collection}/delete")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Response deleteCollection(@ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionName @PathVariable("collection") String collection
+  public Response deleteCollection(@PathVariable("cluster") String cluster,
+      @PathVariable("collection") String collection
   ) {
 
-    return lightningService.deleteCollection(cluster, collection);
+    return cloudManagerService.deleteCollection(cluster, collection);
   }
 
 
@@ -206,7 +191,7 @@ public class CloudLightningController {
   @GetMapping("/clusters")
   public Response listAllClusters() {
 
-    return lightningService.listAllClusters();
+    return cloudManagerService.listAllClusters();
   }
 
 
@@ -227,7 +212,7 @@ public class CloudLightningController {
       })
   @PostMapping("/{cluster}/config/{collectionName}/push")
   @ResponseStatus(HttpStatus.OK)
-  public Response pushConfig(@ValidCluster @PathVariable("cluster") String cluster,
+  public Response pushConfig(@PathVariable("cluster") String cluster,
       @PathVariable("collectionName") String collectionName,
       @RequestParam(name = "reload", defaultValue = "false") boolean reload,
       @RequestParam(name = "configName") String configName,
@@ -235,8 +220,7 @@ public class CloudLightningController {
       @RequestBody Set<String> configLines
   ) {
 
-    return lightningService
-        .pushConfig(cluster, collectionName, reload, configName, configLines, appendDir);
+    return null;
   }
 
   @ApiOperation(
@@ -256,34 +240,35 @@ public class CloudLightningController {
       })
   @DeleteMapping("/{cluster}/{collectionName}/deleteData")
   @ResponseStatus(HttpStatus.OK)
-  public Response deleteData(@ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
+  public Response deleteData(@PathVariable("cluster") String cluster,
+      @PathVariable("collectionName") String collectionName,
       @RequestParam(name = "commit", defaultValue = "false") boolean commit) {
-    return lightningService.deleteCollectionData(cluster, collectionName, commit);
+    return cloudManagerService.deleteCollectionData(cluster, collectionName, commit);
   }
 
-  @ApiOperation(
-      value = "API for Change Config data from SOLR collection",
-      notes =
-          "For a given CollectionName, change config from the "
-              + "collecion of a cluster",
-      code = 200,
-      response = Response.class)
-  @ApiResponses(
-      value = {
-          @ApiResponse(
-              code = 400,
-              message = "Solr Cloud Manager exceptions",
-              response = Response.class),
-          @ApiResponse(code = 200, response = Response.class, message = "")
-      })
-  @PostMapping("/{cluster}/{collectionName}/changeConfig")
-  @ResponseStatus(HttpStatus.OK)
-  public Response changeConfigSet(@ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @RequestParam(name = "configName") String configName,
-      @RequestParam(name = "configValue") String value) {
-    return lightningService.changeConfigSet(cluster, collectionName, configName, value);
-  }
+//
+//  @ApiOperation(
+//      value = "API for Change Config data from SOLR collection",
+//      notes =
+//          "For a given CollectionName, change config from the "
+//              + "collecion of a cluster",
+//      code = 200,
+//      response = Response.class)
+//  @ApiResponses(
+//      value = {
+//          @ApiResponse(
+//              code = 400,
+//              message = "Solr Cloud Manager exceptions",
+//              response = Response.class),
+//          @ApiResponse(code = 200, response = Response.class, message = "")
+//      })
+//  @PostMapping("/{cluster}/{collectionName}/uploadConfig")
+//  @ResponseStatus(HttpStatus.OK)
+//  public Response changeConfigSet(@PathVariable("cluster") String cluster,
+//      @PathVariable("collectionName") String collectionName,
+//      @RequestParam(name = "configName") String configName,
+//      @RequestParam(name = "configValue") String value) {
+//    return cloudManagerService.deleteCollectionData(cluster, collectionName, commit);;
+//  }
 
 }

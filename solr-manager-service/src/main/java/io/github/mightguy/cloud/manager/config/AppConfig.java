@@ -1,4 +1,3 @@
-
 package io.github.mightguy.cloud.manager.config;
 
 import java.util.Map;
@@ -13,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Data
 @Configuration
-@ConfigurationProperties
+@ConfigurationProperties(prefix = "solrmanager")
 public class AppConfig {
 
   private GitInfo gitInfo;
@@ -30,6 +29,7 @@ public class AppConfig {
     private Integer zkConnectTimeout;
     private Integer zkClientTimeout;
     private Integer solrSoTimeout;
+    private boolean isAuthEnabled;
   }
 
   @Data

@@ -1,14 +1,10 @@
 package io.github.mightguy.cloud.manager.controller;
 
-import io.github.mightguy.cloud.manager.constraints.ValidCluster;
-import io.github.mightguy.cloud.manager.constraints.ValidCollectionName;
 import io.github.mightguy.cloud.manager.model.Response;
-import io.github.mightguy.cloud.manager.service.CdcrManagerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,9 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CdcrManagerController {
 
 
-  @Autowired
-  CdcrManagerService cdcrManagerService;
-
   @ApiOperation(
       value = "API for restoring Starting of a SOLR collection CDCR",
       notes =
@@ -48,9 +41,9 @@ public class CdcrManagerController {
       })
   @PostMapping("/{cluster}/{collectionName}/start")
   public Response startCDCR(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster) {
-    return cdcrManagerService.startCdcr(cluster, collectionName);
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster) {
+    return null;
   }
 
   @ApiOperation(
@@ -69,9 +62,9 @@ public class CdcrManagerController {
       })
   @PostMapping("/{cluster}/{collectionName}/stop")
   public Response stopCDCR(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster) {
-    return cdcrManagerService.stopCdcr(cluster, collectionName);
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster) {
+    return null;
   }
 
 
@@ -91,9 +84,9 @@ public class CdcrManagerController {
       })
   @PostMapping("/{cluster}/{collectionName}/buffer/enable")
   public Response enableBufferOnCDCRUpdates(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster) {
-    return cdcrManagerService.changeBufferStateOnCDCRUpdates(cluster, collectionName, true);
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster) {
+    return null;
   }
 
 
@@ -113,9 +106,9 @@ public class CdcrManagerController {
       })
   @PostMapping("/{cluster}/{collectionName}/buffer/disbale")
   public Response disableBufferOnCDCRUpdates(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster) {
-    return cdcrManagerService.changeBufferStateOnCDCRUpdates(cluster, collectionName, false);
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster) {
+    return null;
   }
 
   @ApiOperation(
@@ -134,9 +127,9 @@ public class CdcrManagerController {
       })
   @GetMapping("/{cluster}/{collectionName}/status")
   public Response getCurrentState(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster) {
-    return cdcrManagerService.currentStateCDCR(cluster, collectionName);
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster) {
+    return null;
   }
 
   @ApiOperation(
@@ -155,9 +148,9 @@ public class CdcrManagerController {
       })
   @GetMapping("/{cluster}/{collectionName}/status/errors")
   public Response monitorCDCRErrors(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster) {
-    return cdcrManagerService.monitorCdcrERRORStats(cluster, collectionName);
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster) {
+    return null;
   }
 
   @ApiOperation(
@@ -176,9 +169,9 @@ public class CdcrManagerController {
       })
   @GetMapping("/{cluster}/{collectionName}/stats/queue")
   public Response monitorCDCRQueueStats(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster) {
-    return cdcrManagerService.monitorCdcrQueueStats(cluster, collectionName);
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster) {
+    return null;
   }
 
   @ApiOperation(
@@ -198,9 +191,9 @@ public class CdcrManagerController {
       })
   @GetMapping("/{cluster}/{collectionName}/stats/replication")
   public Response monitorCDCRReplicationLogs(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster) {
-    return cdcrManagerService.monitorCDCRReplicationLogs(cluster, collectionName);
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster) {
+    return null;
   }
 
 

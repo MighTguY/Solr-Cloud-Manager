@@ -1,35 +1,41 @@
 package io.github.mightguy.cloud.manager.model;
 
-import lombok.Builder;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-@Builder
 @Getter
 @Setter
-public class InitializerConfig {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public final class InitializerConfig {
 
   private String gitUser;
   private String gitPassword;
   private String folder;
-  private String cluster;
   private String gitBranch;
 
-  @Builder.Default
-  private String collection = "ALL";
+  @JsonIgnore
+  private String cluster;
 
-  private boolean override;
-  private boolean deleteOldCollections;
-  private boolean uploadZkConf;
+  @NotBlank
+  @NotNull
+  private String collection;
 
-  @Builder.Default
+  private boolean override = false;
+  private boolean deleteOldCollections = false;
+  private boolean uploadZkConf = false;
+
   private boolean createAlias = true;
-  @Builder.Default
   private boolean reload = true;
-  @Builder.Default
   private boolean gitPull = false;
-  @Builder.Default
-  private Integer replicationFactor = null;
-  @Builder.Default
-  private Integer shardCount = null;
+
+  @Min(1)
+  private int replicationFactor = 1;
+  @Min(1)
+  private int shardCount = 1;
 }

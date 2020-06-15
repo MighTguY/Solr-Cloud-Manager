@@ -8,7 +8,6 @@ info.app.version: 1.0.0
 management.endpoint.metrics.enabled: true
 management.health.solr.enabled: false
 management.endpoints.enabled-by-default: true
-management.security.enabled: false
 management.endpoint.prometheus.enabled: true
 management.metrics.export.prometheus.enabled: true
 spring.application.name: "Solr Cloud Manager"
@@ -18,22 +17,24 @@ management:
       exposure:
         include: "*"
 
-gitInfo:
-  clonepath: "/tmp/config"
-  url: "https://some-git-url.git"
-  branch: "master"
-  user: "username"
-  password: "password"
-  app: "folder-name-to-search-in-git-repo"
+solrmanager:
+  gitInfo:
+    clonepath: "/tmp/config"
+    url: "https://some-git-url.git"
+    branch: "master"
+    user: "username"
+    password: "password"
+    app: "folder-name-to-search-in-git-repo"
 
-clusters:
-  default:
-    zKChroot: /
-    zkClientTimeout: 20000
-    zkConnectTimeout: 20000
-    zkUrl: "localhost:2181"
+  clusters:
+    default:
+      zKChroot: /
+      zkClientTimeout: 20000
+      zkConnectTimeout: 20000
+      zkUrl: "localhost:2181"
+      isAuthEnabled: false
 
-backupInfo:
-  backupSuffix: "_backup"
-  restoreSuffix: "_restore"
-  backupLocation: "/tmp/backup"
+  backupInfo:
+    backupSuffix: "_backup"
+    restoreSuffix: "_restore"
+    backupLocation: "/tmp/backup"

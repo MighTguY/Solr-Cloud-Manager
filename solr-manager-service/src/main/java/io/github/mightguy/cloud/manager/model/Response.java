@@ -1,4 +1,3 @@
-
 package io.github.mightguy.cloud.manager.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;

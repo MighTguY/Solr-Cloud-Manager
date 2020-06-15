@@ -1,4 +1,3 @@
-
 package io.github.mightguy.cloud.manager.util;
 
 public final class Constants {
@@ -8,7 +7,7 @@ public final class Constants {
 
   public static final String ZK_MODE_CLIENT = "zk";
   public static final String HTTP_MODE_CLIENT = "http";
-  public static final String ALL_COLLECTIONS = "all";
+  public static final String ALL = "all";
   public static final String STATUS_COLLECTIONS_RELOAD_COMPLETED = "collections reload is complete";
   public static final String STATUS_COLLECTIONS_INTITALIZED =
       "SolrCloud All Collections got initialized";

@@ -1,9 +1,6 @@
-
 package io.github.mightguy.cloud.manager.config;
 
 import java.util.ArrayList;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -12,9 +9,7 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.DocExpansion;
 import springfox.documentation.swagger.web.OperationsSorter;
-import springfox.documentation.swagger.web.TagsSorter;
 import springfox.documentation.swagger.web.UiConfiguration;
 import springfox.documentation.swagger.web.UiConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -27,10 +22,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
-
-
-  @Autowired
-  AppConfig appConfig;
 
   @Bean
   public Docket productApi() {
@@ -45,8 +36,7 @@ public class SwaggerConfig {
   private ApiInfo metaData() {
     return new ApiInfo(
         "Spring Boot REST API",
-        "Spring Boot REST API for Managing Solr Cloud,  Clusters " + appConfig.getClusters()
-            .keySet(),
+        "Spring Boot REST API for Managing Solr Cloud,  Clusters ",
         "1.0",
         "Terms of service",
         new Contact("Github Mightguy Co.", "", "lucky_sharma0910@yahoo.com"),

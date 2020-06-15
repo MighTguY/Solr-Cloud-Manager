@@ -1,14 +1,10 @@
 package io.github.mightguy.cloud.manager.controller;
 
-import io.github.mightguy.cloud.manager.constraints.ValidCluster;
-import io.github.mightguy.cloud.manager.constraints.ValidCollectionName;
-import io.github.mightguy.cloud.manager.manager.DataBackupManagerService;
 import io.github.mightguy.cloud.manager.model.Response;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DataBackupController {
 
 
-  @Autowired
-  DataBackupManagerService dataBackupManagerService;
-
   @ApiOperation(
       value = "API for backing up all SOLR collections",
       notes =
@@ -51,9 +44,9 @@ public class DataBackupController {
       })
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/cloud/{cluster}/all")
-  public Response backupAll(@ValidCluster @PathVariable("cluster") String cluster) {
+  public Response backupAll(@PathVariable("cluster") String cluster) {
 
-    return dataBackupManagerService.createBackup(cluster);
+    return null;
   }
 
   @ApiOperation(
@@ -72,10 +65,10 @@ public class DataBackupController {
       })
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/cloud/{cluster}/{collectionName}")
-  public Response backupCollection(@ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionName @PathVariable("collectionName") String collectionName) {
+  public Response backupCollection(@PathVariable("cluster") String cluster,
+      @PathVariable("collectionName") String collectionName) {
 
-    return dataBackupManagerService.createBackup(cluster, collectionName, null, null);
+    return null;
   }
 
   @ApiOperation(
@@ -93,10 +86,10 @@ public class DataBackupController {
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
   @PostMapping("/restore/cloud/{cluster}/all")
-  public Response restoreAll(@ValidCluster @PathVariable("cluster") String cluster,
+  public Response restoreAll(@PathVariable("cluster") String cluster,
       @RequestParam(name = "repo") String repo) {
 
-    return dataBackupManagerService.restoreFullBackup(cluster, repo);
+    return null;
   }
 
   @ApiOperation(
@@ -115,11 +108,11 @@ public class DataBackupController {
       })
   @PostMapping("/restore/cloud/{cluster}/{collectionName}")
   public Response restoreCollection(
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @ValidCluster @PathVariable("cluster") String cluster,
+      @PathVariable("collectionName") String collectionName,
+      @PathVariable("cluster") String cluster,
       @RequestParam(name = "repo") String repo) {
 
-    return dataBackupManagerService.restoreBackup(cluster, repo, collectionName);
+    return null;
   }
 
   @ApiOperation(
@@ -135,9 +128,9 @@ public class DataBackupController {
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
   @GetMapping("/cloud/{cluster}/backup")
-  public Response listAllbackup(@ValidCluster @PathVariable("cluster") String cluster) {
+  public Response listAllbackup(@PathVariable("cluster") String cluster) {
 
-    return dataBackupManagerService.listBackups(cluster);
+    return null;
   }
 
 

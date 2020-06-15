@@ -1,4 +1,3 @@
-
 package io.github.mightguy.cloud.manager.controller;
 
 import io.github.mightguy.cloud.manager.exception.SolrCommonsException;
