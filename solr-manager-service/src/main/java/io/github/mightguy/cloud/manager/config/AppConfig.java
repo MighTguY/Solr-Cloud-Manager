@@ -1,15 +1,20 @@
 package io.github.mightguy.cloud.manager.config;
 
+import io.github.mightguy.cloud.manager.util.CloudInitializerUtils;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
  * The class {@code AppConfig} holds all the app related config
  */
+@Slf4j
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "solrmanager")
@@ -52,5 +57,4 @@ public class AppConfig {
     String restoreSuffix;
     String backupLocation;
   }
-
 }
