@@ -10,12 +10,10 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import io.github.mightguy.cloud.manager.config.LightningContext;
-import io.github.mightguy.cloud.manager.exception.ExceptionCode;
-import io.github.mightguy.cloud.manager.exception.SolrCloudException;
-import io.github.mightguy.cloud.manager.exception.SolrException;
-import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.util.CloudInitializerUtils;
-import io.github.mightguy.cloud.manager.util.Constants;
+
+import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
+import io.github.mightguy.cloud.solr.commons.exception.SolrCloudException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -27,11 +25,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
-import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.common.params.CollectionParams.CollectionAction;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 
@@ -158,39 +152,5 @@ public class AliasManager {
     }
   }
 
-  public Response deleteAllAliases(String cluster) {
-    lightningContext.getSolrAliasToCollectionMap(cluster).keySet()
-        .forEach(alias -> deleteAlias(cluster, alias));
-    return new Response(HttpStatus.ACCEPTED, Constants.ALL_ALIASES_DELETED);
-  }
 
-  private void deleteAlias(String cluster, String alias) {
-    try {
-      if (!lightningContext.getSolrAliasToCollectionMap(cluster).containsKey(alias)) {
-        return;
-      }
-      ModifiableSolrParams params = new ModifiableSolrParams();
-      params.set("name", alias);
-      params.set("action", CollectionAction.DELETEALIAS.toString());
-      QueryRequest request = new QueryRequest(params);
-      request.setPath("/admin/collections");
-      lightningContext.getSolrClient(cluster).request(request);
-    } catch (IOException | SolrServerException ex) {
-      throw new SolrException(ex, ExceptionCode.SOLR_EXCEPTION,
-          "Alias Deletion Failed [" + alias + "]");
-    }
-  }
-
-
-  public Response createAliasForCollection(String cluster, String collection, String aliasName) {
-    try {
-      CollectionAdminRequest.createAlias(aliasName, collection)
-          .process(lightningContext.getSolrClient(cluster));
-      return new Response(HttpStatus.CREATED,
-          "ALIAS Created " + aliasName + " for collection " + collection);
-    } catch (SolrServerException | IOException ex) {
-      log.error("Exception during collection or alias creation. ", ex);
-      throw new SolrCloudException(ExceptionCode.UNABLE_TO_CREATE_COLLECTION_ALIAS, ex);
-    }
-  }
 }

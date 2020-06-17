@@ -1,17 +1,19 @@
 
 package io.github.mightguy.cloud.manager.manager;
 
+import static io.github.mightguy.cloud.manager.util.CloudInitializerUtils.checkCloudSolrCLientInstance;
+import static io.github.mightguy.cloud.manager.util.CloudInitializerUtils.deleteDir;
 
 import io.github.mightguy.cloud.manager.config.AppConfig.GitInfo;
 import io.github.mightguy.cloud.manager.config.LightningContext;
-import io.github.mightguy.cloud.manager.exception.ExceptionCode;
-import io.github.mightguy.cloud.manager.exception.SolrCloudException;
-import io.github.mightguy.cloud.manager.exception.SolrException;
-import io.github.mightguy.cloud.manager.exception.UnknownCollectionException;
-import io.github.mightguy.cloud.manager.model.InitializerConfig;
 import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.util.CloudInitializerUtils;
 import io.github.mightguy.cloud.manager.util.Constants;
+
+import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
+import io.github.mightguy.cloud.solr.commons.exception.SolrCloudException;
+import io.github.mightguy.cloud.solr.commons.exception.SolrException;
+import io.github.mightguy.cloud.solr.commons.exception.UnknownCollectionException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -22,19 +24,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
-import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.client.solrj.request.RequestWriter.ContentWriter;
-import org.apache.solr.client.solrj.request.RequestWriter.StringPayloadContentWriter;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
-import org.apache.solr.client.solrj.response.SimpleSolrResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.StringUtils;
 import org.apache.solr.common.cloud.ZkConfigManager;
@@ -60,41 +56,33 @@ public class SolrCloudManager {
   @Autowired
   AliasManager aliasManager;
 
-  private static final String JSON_CONTENT_TYPE = "application/json";
-  private static final String templateRequestString =
-      "{\"set-property\":{\"PROPERTY_NAME\":PROPERTY_VALUE}}";
-  private static final String PROPERTY_NAME = "PROPERTY_NAME";
-  private static final String PROPERTY_VALUE = "PROPERTY_VALUE";
 
-
-  public void initializeSolrCloud(InitializerConfig initializerConfig) {
+  public void initializeSolrCloud(String cluster, boolean override, boolean deleteOldCollections,
+      boolean uploadZkConf, String user, String pass, String folder) {
     GitInfo gitInfo = lightningContext.getAppConfig().getGitInfo();
     String gitUrl = gitInfo.getUrl();
     String gitOutPath = gitInfo.getClonepath();
     String branchName = gitInfo.getBranch();
 
-    if (initializerConfig.isDeleteOldCollections()) {
-      deleteCollections(initializerConfig.getCluster());
-      lightningContext.reload(initializerConfig.getCluster());
+    if (deleteOldCollections) {
+      deleteCollections(cluster);
+      lightningContext.reload(cluster);
     }
-    if (initializerConfig.isOverride()) {
+    if (override) {
       solrCloudmanagerHelper
-          .extractGitRepo(gitUrl, gitOutPath, branchName, initializerConfig.isOverride(),
-              initializerConfig.getGitUser(), initializerConfig.getGitPassword());
+          .extractGitRepo(gitUrl, gitOutPath, branchName, override, user, pass);
     }
     Map<String, Path> confPath = solrCloudmanagerHelper
-        .readConfigNameLocations(gitOutPath
-            + Constants.SLASH + initializerConfig.getFolder());
-    if (initializerConfig.isUploadZkConf()) {
-      solrCloudmanagerHelper.uploadConfigs(confPath,
-          lightningContext.getConfigManager(initializerConfig.getCluster()));
+        .readConfigNameLocations(gitOutPath + Constants.SLASH + folder);
+    if (uploadZkConf) {
+      solrCloudmanagerHelper.uploadConfigs(confPath, lightningContext.getConfigManager(cluster));
     }
-    List<String> collections = createCollections(initializerConfig.getCluster(), confPath);
-    aliasManager.createAlias(initializerConfig.getCluster(), collections);
-    lightningContext.reload(initializerConfig.getCluster());
-    reloadCollections(initializerConfig.getCluster(), collections, false);
-    if (initializerConfig.isOverride()) {
-      CloudInitializerUtils.deleteDir(gitOutPath);
+    List<String> collections = createCollections(cluster, confPath);
+    aliasManager.createAlias(cluster, collections);
+    lightningContext.reload(cluster);
+    reloadCollections(cluster, collections, false);
+    if (override) {
+      deleteDir(gitOutPath);
     }
   }
 
@@ -140,8 +128,7 @@ public class SolrCloudManager {
       String collectionSuffix,
       SolrClient solrClient
   ) {
-    CloudSolrClient cloudSolrClient =
-        CloudInitializerUtils.checkCloudSolrCLientInstance(solrClient);
+    CloudSolrClient cloudSolrClient = checkCloudSolrCLientInstance(solrClient);
     try {
       String collectionNameToCreate = collectionName + collectionSuffix;
       if (lightningContext.getCollectionList(cluster).contains(collectionNameToCreate)) {
@@ -214,7 +201,7 @@ public class SolrCloudManager {
   }
 
   public Response deleteCollections(String cluster) {
-    aliasManager.deleteAllAliases(cluster);
+    deleteAllAliases(cluster);
     lightningContext.getCollectionList(cluster)
         .forEach(collection -> deleteCollection(cluster, collection));
     return new Response(HttpStatus.ACCEPTED, Constants.ALL_COLLECTION_DELETED);
@@ -261,6 +248,12 @@ public class SolrCloudManager {
   }
 
 
+  public Response deleteAllAliases(String cluster) {
+    lightningContext.getSolrAliasToCollectionMap(cluster).keySet()
+        .forEach(alias -> deleteAlias(cluster, alias));
+    return new Response(HttpStatus.ACCEPTED, Constants.ALL_ALIASES_DELETED);
+  }
+
   public Response listAllClusters() {
     Response response = new Response(HttpStatus.OK, "");
     response.setResp(lightningContext.getAppConfig().getClusters());
@@ -271,43 +264,36 @@ public class SolrCloudManager {
       String configName, Set<String> contents, String appendDir) {
 
     ZkConfigManager zkConfigManager = lightningContext.getConfigManager(cluster);
-    try {
-      List<String> configNames = zkConfigManager.listConfigs().stream()
-          .filter(s -> s.contains(collectionName)).collect(
-              Collectors.toList());
-      for (String config : configNames) {
-        File dir = new File("/tmp/managed-content-intitializer/" + config);
-        CloudInitializerUtils.deleteDir(dir.getAbsolutePath());
-        if (dir.mkdirs()) {
-          log.info("Managed content dir created");
-        }
-        String configPath = dir.getAbsolutePath();
-        if (!StringUtils.isEmpty(appendDir)) {
-          configPath = configPath + Constants.SLASH + appendDir;
-          new File(configPath).mkdirs();
-        }
+    File dir = new File("/tmp/managed-content-intitializer/" + collectionName);
+    deleteDir(dir.getAbsolutePath());
+    if (dir.mkdirs()) {
+      log.info("Managed content dir created");
+    }
+    String configPath = dir.getAbsolutePath();
+    if (!StringUtils.isEmpty(appendDir)) {
+      configPath = configPath + Constants.SLASH + appendDir;
+      new File(configPath).mkdirs();
+    }
 
-        File file = new File(configPath + Constants.SLASH + configName);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
+    File file = new File(configPath + Constants.SLASH + configName);
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
 
-          for (String data : contents) {
-            writer.append(data).append("\n");
-          }
-          writer.close();
-          Map<String, Path> dataPath = Collections.singletonMap(config, dir.toPath());
-          solrCloudmanagerHelper.uploadConfigs(dataPath, zkConfigManager);
-          if (reload) {
-            reloadCollection(cluster, collectionName, false);
-          }
-        }
+      for (String data : contents) {
+        writer.append(data).append("\n");
+      }
+      writer.close();
+      Map<String, Path> dataPath = Collections.singletonMap(collectionName, dir.toPath());
+      solrCloudmanagerHelper.uploadConfigs(dataPath, zkConfigManager);
+      if (reload) {
+        reloadCollection(cluster, collectionName, false);
       }
       return new Response(HttpStatus.OK,
-          "Config [" + configNames.toString() + "] pushed to SOLR collection[" + collectionName
-              + "]");
+          "Config [" + configName + "] pushed to SOLR collection[" + collectionName + "]");
     } catch (IOException e) {
       log.error("Exception during configuration upload.", e);
       throw new SolrCloudException(ExceptionCode.SOLR_CLOUD_INVALID_CONFIG, e);
     }
+
 
   }
 
@@ -323,28 +309,6 @@ public class SolrCloudManager {
       return new Response(HttpStatus.OK,
           "Deletion for [" + collectionName + "] of [" + cluster + "] successfull elapsed ["
               + updateResponse.getElapsedTime() + "]");
-    } catch (SolrServerException | IOException ex) {
-      log.error("Exception during collection reload. ", ex);
-      throw new SolrCloudException(ex, ExceptionCode.UNABLE_TO_RELOAD_COLLECTION, collectionName);
-    }
-  }
-
-  public Response changeConfigSet(String cluster, String collectionName, String configName,
-      String value) {
-    try {
-      final GenericSolrRequest rq = new GenericSolrRequest(SolrRequest.METHOD.POST, "/config",
-          null);
-      final String requestString = templateRequestString
-          .replace(PROPERTY_NAME, configName)
-          .replaceAll(PROPERTY_VALUE, value);
-      final ContentWriter content = new StringPayloadContentWriter(requestString,
-          JSON_CONTENT_TYPE);
-      rq.setContentWriter(content);
-      SolrClient solrClient = lightningContext.getSolrClient(cluster);
-      SimpleSolrResponse response = rq.process(solrClient, collectionName);
-      return new Response(HttpStatus.OK,
-          "Config updated for [" + collectionName + "] of [" + cluster + "] successfull elapsed ["
-              + response.getElapsedTime() + "]", response.getResponse().get("QTime"));
     } catch (SolrServerException | IOException ex) {
       log.error("Exception during collection reload. ", ex);
       throw new SolrCloudException(ex, ExceptionCode.UNABLE_TO_RELOAD_COLLECTION, collectionName);

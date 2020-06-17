@@ -1,12 +1,11 @@
 
-package io.github.mightguy.cloud.manager.request;
+package io.github.mightguy.cloud.solr.commons.request;
 
-
-import io.github.mightguy.cloud.manager.config.SolrClientFactory;
-import io.github.mightguy.cloud.manager.config.ZkConfiguration;
-import io.github.mightguy.cloud.manager.exception.ExceptionCode;
-import io.github.mightguy.cloud.manager.exception.SearchQueryException;
-import io.github.mightguy.cloud.manager.exception.SolrException;
+import io.github.mightguy.cloud.solr.commons.config.SolrClientFactory;
+import io.github.mightguy.cloud.solr.commons.config.ZkConfiguration;
+import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
+import io.github.mightguy.cloud.solr.commons.exception.SearchQueryException;
+import io.github.mightguy.cloud.solr.commons.exception.SolrException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrClient;
@@ -34,11 +33,12 @@ public class QueryRequestManager {
   /**
    * Method to get Response from the solr. SolrParams {@link SolrParams} contains the query
    * parameters, will call getSelectQueryResponseFromClient() after fetching the {@link
-   * io.github.mightguy.cloud.manager.config.SolrClientFactory}
-   * using the collectionName from  getSolrClientByCollectionName
+   * io.github.mightguy.cloud.solr.commons.config.SolrClientFactory} using the collectionName from
+   * getSolrClientByCollectionName
    *
-   * @param params {@link SolrParams}
+   * @param params         {@link SolrParams}
    * @param collectionName {@link String}
+   * @param method
    * @return {@link QueryResponse}
    */
   public QueryResponse getResponse(SolrParams params,
@@ -55,8 +55,10 @@ public class QueryRequestManager {
    * parameters, will call getSelectQueryResponseFromClient() after fetching the {@link
    * SolrClientFactory} using the collectionName from  getSolrClientByCollectionName
    *
-   * @param params {@link SolrParams}
+   * @param params         {@link SolrParams}
    * @param collectionName {@link String}
+   * @param method
+   * @param requestPath
    * @return {@link QueryResponse}
    */
   public QueryResponse getResponse(SolrParams params,
@@ -74,8 +76,9 @@ public class QueryRequestManager {
    * parameters
    *
    * @param solrClientFactory {@link SolrClientFactory}
-   * @param solrParams {@link SolrParams}
-   * @param requestPath {@link String}
+   * @param solrParams        {@link SolrParams}
+   * @param method
+   * @param requestPath       {@link String}
    * @return {@link QueryResponse} queryResponse from SOLR
    * @throws {@link SearchQueryException}
    */

@@ -1,4 +1,4 @@
-package io.github.mightguy.cloud.manager.exception;
+package io.github.mightguy.cloud.solr.commons.exception;
 
 import org.springframework.http.HttpStatus;
 
@@ -15,7 +15,7 @@ public enum ExceptionCode {
   SOLR_CLIENT_BOOTSTRAP_EXCEPTION("Unable to Bootstrap Solr Client Exception occured",
       HttpStatus.BAD_REQUEST),
   SOLR_EXCEPTION("Solr Server Exception occured", HttpStatus.BAD_REQUEST),
-  SOLR_EXCEPTION_CDCR("Exception during CDCR", HttpStatus.BAD_REQUEST),
+  SOLR_EXCEPTION_INDEXING("Exception during indexing core", HttpStatus.BAD_REQUEST),
   SOLR_EXCEPTION_COMMITING_CORE("Exception during commiting core", HttpStatus.BAD_REQUEST),
   SOLR_CLOUD_SUPPORTED_ONLY("Only Solr Cloud Is Supported", HttpStatus.BAD_REQUEST),
   SOLR_CLOUD_INVALID_CONFIG("Invalid Config set location", HttpStatus.BAD_REQUEST),

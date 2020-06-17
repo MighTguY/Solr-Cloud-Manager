@@ -8,7 +8,7 @@ import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SolrCloudClusterInfo implements InfoContributor {
+public class SolrCloudClusterInfo  implements InfoContributor {
 
   @Autowired
   LightningContext lightningContext;

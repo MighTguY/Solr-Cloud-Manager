@@ -1,5 +1,5 @@
 
-package io.github.mightguy.cloud.manager.config;
+package io.github.mightguy.cloud.solr.commons.config;
 
 import java.util.List;
 import java.util.Map;

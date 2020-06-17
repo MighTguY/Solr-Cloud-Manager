@@ -1,13 +1,13 @@
 
-package io.github.mightguy.cloud.manager.request;
+package io.github.mightguy.cloud.solr.commons.request;
 
 
-import io.github.mightguy.cloud.manager.config.RemoteSolrClientFactory;
-import io.github.mightguy.cloud.manager.config.SolrClientFactory;
-import io.github.mightguy.cloud.manager.config.SolrConfigruationProperties;
-import io.github.mightguy.cloud.manager.config.ZkConfiguration;
-import io.github.mightguy.cloud.manager.exception.ExceptionCode;
-import io.github.mightguy.cloud.manager.exception.UnknownCollectionException;
+import io.github.mightguy.cloud.solr.commons.config.RemoteSolrClientFactory;
+import io.github.mightguy.cloud.solr.commons.config.SolrClientFactory;
+import io.github.mightguy.cloud.solr.commons.config.SolrConfigruationProperties;
+import io.github.mightguy.cloud.solr.commons.config.ZkConfiguration;
+import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
+import io.github.mightguy.cloud.solr.commons.exception.UnknownCollectionException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 /**
  * {@code RequestManager} is the parent class, which is responsible to create request to the
  * collection.
- *
+ * <p>
  * This bootstraps all the solrClientFactory so that this can be used to create a request on any of
  * them.
  */
@@ -47,7 +47,7 @@ public class RequestUtil {
   /**
    * To initialize solrClientFactoryMap and selectQueryCollectionMap by collection name vs {@link
    * SolrClientFactory} and collection name vs
-   * {@link io.github.mightguy.cloud.manager.util.Constants}
+   * {@link io.github.mightguy.cloud.solr.commons.utils.Constants}
    * of Request Handler name.
    */
   @PostConstruct

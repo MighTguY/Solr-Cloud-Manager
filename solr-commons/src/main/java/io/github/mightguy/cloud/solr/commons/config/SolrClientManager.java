@@ -1,5 +1,5 @@
 
-package io.github.mightguy.cloud.manager.config;
+package io.github.mightguy.cloud.solr.commons.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;

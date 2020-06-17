@@ -29,7 +29,6 @@ public class AppConfig {
     private String zkChRoot;
     private Integer zkConnectTimeout;
     private Integer zkClientTimeout;
-    private Integer solrSoTimeout;
   }
 
   @Data

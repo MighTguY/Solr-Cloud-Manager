@@ -1,11 +1,14 @@
 
 package io.github.mightguy.cloud.manager.config;
 
+
 import io.github.mightguy.cloud.manager.config.AppConfig.ZkCluster;
-import io.github.mightguy.cloud.manager.exception.ExceptionCode;
-import io.github.mightguy.cloud.manager.exception.SolrException;
-import io.github.mightguy.cloud.manager.request.QueryRequestManager;
 import io.github.mightguy.cloud.manager.util.CloudInitializerUtils;
+import io.github.mightguy.cloud.solr.commons.config.SolrClientFactory;
+import io.github.mightguy.cloud.solr.commons.config.SolrConfigruationProperties;
+import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
+import io.github.mightguy.cloud.solr.commons.exception.SolrException;
+import io.github.mightguy.cloud.solr.commons.request.QueryRequestManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -1,5 +1,5 @@
 
-package io.github.mightguy.cloud.manager.exception;
+package io.github.mightguy.cloud.solr.commons.exception;
 
 /**
  * {@code SearchQueryException}  is  thrown when an application attempts to
