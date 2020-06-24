@@ -1,7 +1,6 @@
 
 package io.github.mightguy.cloud.manager.util;
 
-
 import io.github.mightguy.cloud.manager.config.LightningContext;
 import java.io.IOException;
 import java.util.Map;

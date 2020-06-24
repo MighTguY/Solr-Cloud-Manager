@@ -1,5 +1,5 @@
 
-package io.github.mightguy.cloud.manager.config;
+package io.github.mightguy.cloud.solr.commons.config;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -21,7 +21,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableConfigurationProperties({SolrConfigruationProperties.class})
 @ComponentScan(
     basePackages = {
-        "io.github.mightguy.cloud.*"
+        "io.github.mightguy.*"
     })
 public class CoreConfiguration {
 

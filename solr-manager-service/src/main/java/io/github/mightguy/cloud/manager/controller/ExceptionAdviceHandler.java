@@ -1,8 +1,8 @@
 
 package io.github.mightguy.cloud.manager.controller;
 
-import io.github.mightguy.cloud.manager.exception.SolrCommonsException;
 import io.github.mightguy.cloud.manager.model.Response;
+import io.github.mightguy.cloud.solr.commons.exception.SolrCommonsException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.ConstraintViolation;

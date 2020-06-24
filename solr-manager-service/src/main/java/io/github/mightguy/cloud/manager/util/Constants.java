@@ -6,8 +6,6 @@ public final class Constants {
   private Constants() {
   }
 
-  public static final String ZK_MODE_CLIENT = "zk";
-  public static final String HTTP_MODE_CLIENT = "http";
   public static final String ALL_COLLECTIONS = "all";
   public static final String STATUS_COLLECTIONS_RELOAD_COMPLETED = "collections reload is complete";
   public static final String STATUS_COLLECTIONS_INTITALIZED =
@@ -31,6 +29,7 @@ public final class Constants {
       "Solr cloud successfully initialized";
   public static final String SOLR_CLOUD_INITIALIZATION_FAILED = "Solr cloud  initialization failed";
   public static final String SLASH = "/";
+
 
 
 }

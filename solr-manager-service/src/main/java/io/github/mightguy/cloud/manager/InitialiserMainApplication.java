@@ -1,7 +1,7 @@
 
 package io.github.mightguy.cloud.manager;
 
-import io.github.mightguy.cloud.manager.config.CoreConfiguration;
+import io.github.mightguy.cloud.solr.commons.config.CoreConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.DependsOn;

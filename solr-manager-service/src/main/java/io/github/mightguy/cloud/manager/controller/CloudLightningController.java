@@ -1,15 +1,12 @@
 
 package io.github.mightguy.cloud.manager.controller;
 
-
 import io.github.mightguy.cloud.manager.constraints.ValidCluster;
 import io.github.mightguy.cloud.manager.constraints.ValidCollectionName;
 import io.github.mightguy.cloud.manager.constraints.ValidCollectionNameForAlias;
 import io.github.mightguy.cloud.manager.constraints.ValidValue;
-import io.github.mightguy.cloud.manager.model.InitializerConfig;
 import io.github.mightguy.cloud.manager.model.Response;
-import io.github.mightguy.cloud.manager.service.LightningService;
-import io.swagger.annotations.Api;
+import io.github.mightguy.cloud.manager.service.LightningServiceFacade;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -30,16 +27,106 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * The class {@code CloudLightningController} is the Controller facade for the Solr Cloud, This will
- * be responsible for performing Cloud management
+ * be responsible for performing 1. Cloud Initialize 2. Config update & reload collection 3. Alias
+ * creation & switching
  */
-@Api(tags = {"Solr Cloud Core Management"})
 @RestController
 @Validated
-@RequestMapping({"/cloud"})
+@RequestMapping({"${microservice.contextPath}"})
 public class CloudLightningController {
 
   @Autowired
-  LightningService lightningService;
+  LightningServiceFacade lightningService;
+
+
+  @ApiOperation(
+      value = "API for fetching  alias mapping for SOLR collection",
+      notes =
+          "For a given CollectionName, fetch both live and shadow aliases",
+      code = 200,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 200, response = Response.class, message = "")
+      })
+  @GetMapping("/cloud/{cluster}/alias/{collectionName}")
+  public Response getAliasesFromSolrForCollection(
+      @ValidCluster @PathVariable("cluster") String cluster,
+      @ValidCollectionNameForAlias @PathVariable("collectionName") String collectionName) {
+
+    return lightningService.getAlias(cluster, collectionName);
+  }
+
+  @ApiOperation(
+      value = "API for fetching  alias mapping for all SOLR collections",
+      notes =
+          "For a given cluster, fetch both live and shadow aliases",
+      code = 200,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 200, response = Response.class, message = "")
+      })
+  @GetMapping("/cloud/{cluster}/alias")
+  public Response getAllAliasesFromSolr(@ValidCluster @PathVariable("cluster") String cluster) {
+    return lightningService.getAlias(cluster, "all");
+  }
+
+  @ApiOperation(
+      value = "API for switching  alias mapping for SOLR collection",
+      notes =
+          "For a given CollectionName, switch both live and shadow aliases"
+              + "for information on all Collection Aliases, use all in collecionName",
+      code = 200,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 200, response = Response.class, message = "")
+      })
+  @PutMapping("/cloud/{cluster}/alias/{collectionName}/switch")
+  @ResponseStatus(HttpStatus.OK)
+  public Response aliasSwtich(@ValidCluster @PathVariable("cluster") String cluster,
+      @ValidCollectionNameForAlias @PathVariable("collectionName") String collectionName,
+      @RequestParam(name = "reload", defaultValue = "false") boolean reload
+  ) {
+
+    return lightningService.switchAlias(cluster, collectionName, reload);
+  }
+
+  @ApiOperation(
+      value = "API for switching  alias mapping for all SOLR collections",
+      notes =
+          "For all Collections, switch both live and shadow aliases",
+      code = 200,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 200, response = Response.class, message = "")
+      })
+  @PutMapping("/cloud/{cluster}/alias/switch")
+  @ResponseStatus(HttpStatus.OK)
+  public Response aliasSwtichAll(@ValidCluster @PathVariable("cluster") String cluster,
+      @RequestParam(name = "reload", defaultValue = "false") boolean reload
+  ) {
+
+    return lightningService.switchAlias(cluster, "all", reload);
+  }
 
 
   @ApiOperation(
@@ -58,7 +145,7 @@ public class CloudLightningController {
           @ApiResponse(code = 200, response = Response.class, message =
               "Solr Cloud Initialization is Completed")
       })
-  @PostMapping("/{cluster}/initialize")
+  @PostMapping("/cloud/{cluster}/initialize")
   @ResponseStatus(HttpStatus.CREATED)
   public Response doInitializeSolrCloud(
       @ValidCluster @PathVariable("cluster") String cluster,
@@ -69,37 +156,9 @@ public class CloudLightningController {
       @RequestParam(name = "delete_old_collections", required = false) boolean deleteOldCollections,
       @RequestParam(name = "upload_zk_config", required = false) boolean uploadZkConf) {
 
-    InitializerConfig initializerConfig = InitializerConfig.builder().cluster(cluster)
-        .gitUser(gitUser).gitPassword(gitPassword).folder(gitBranch).gitPull(override)
-        .deleteOldCollections(deleteOldCollections).uploadZkConf(uploadZkConf).build();
     return lightningService
-        .initlializeCloudSolr(initializerConfig);
-  }
-
-  @ApiOperation(
-      value = "API for initilaising SOLR cloud collection",
-      notes =
-          "For a given SolrCloud, fetch the configurations "
-              + "and upload them to cloud, and also reload all indexes of that collection",
-      code = 200,
-      response = Response.class)
-  @ApiResponses(
-      value = {
-          @ApiResponse(
-              code = 400,
-              message = "Solr Cloud Manager exceptions",
-              response = Response.class),
-          @ApiResponse(code = 200, response = Response.class, message =
-              "Solr Cloud Initialization is Completed")
-      })
-  @PostMapping("/{cluster}/{collection}/initialize")
-  @ResponseStatus(HttpStatus.CREATED)
-  public Response doInitializeSolrCollection(
-      @ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionName @PathVariable("collection") String collection,
-      @RequestBody InitializerConfig initializerConfig) {
-    return lightningService
-        .initlializeCloudSolr(initializerConfig);
+        .initlializeCloudSolr(cluster, override, deleteOldCollections, uploadZkConf, gitUser,
+            gitPassword, gitBranch);
   }
 
   @ApiOperation(
@@ -117,19 +176,19 @@ public class CloudLightningController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @PutMapping("/{cluster}/reload")
+  @PutMapping("/cloud/{cluster}/reload")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public Response reloadCollection(@ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionNameForAlias @RequestParam(name = "collectionName") String collectionName,
+      @ValidCollectionName @RequestParam(name = "collectionName") String collectionName,
       @RequestParam(name = "onlyShadow", required = false) boolean onlyShadowReload) {
 
     return lightningService.reloadCollection(cluster, collectionName, onlyShadowReload);
   }
 
   @ApiOperation(
-      value = "API for getting all the  SOLR collections",
+      value = "API for reloading  SOLR collection",
       notes =
-          "For a given CollectionName, get all the active and passive collection"
+          "For a given CollectionName, reload all the active and passive collection"
               + "based on the flag onlyShadow, by default both will get reloaded",
       code = 202,
       response = Response.class)
@@ -141,7 +200,7 @@ public class CloudLightningController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @GetMapping("/{cluster}/collections")
+  @GetMapping("/cloud/{cluster}/collections")
   public Response getCollections(@ValidCluster @PathVariable("cluster") String cluster) {
     return lightningService.getCollections(cluster);
   }
@@ -161,7 +220,7 @@ public class CloudLightningController {
           @ApiResponse(code = 202, response = Response.class, message = "All Collections Deleted")
       })
   @ResponseStatus(HttpStatus.ACCEPTED)
-  @DeleteMapping("/{cluster}/deleteAll")
+  @DeleteMapping("/cloud/{cluster}/deleteAll")
   public Response deleteAllCollections(@ValidCluster @PathVariable("cluster") String cluster) {
     return lightningService.deleteCollections(cluster);
   }
@@ -181,13 +240,139 @@ public class CloudLightningController {
               response = Response.class),
           @ApiResponse(code = 202, response = Response.class, message = "")
       })
-  @DeleteMapping("/{cluster}/{collection}/delete")
+  @DeleteMapping("/cloud/{cluster}/{collection}/delete")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public Response deleteCollection(@ValidCluster @PathVariable("cluster") String cluster,
       @ValidCollectionName @PathVariable("collection") String collection
   ) {
 
     return lightningService.deleteCollection(cluster, collection);
+  }
+
+  @ApiOperation(
+      value = "API for deleting a SOLR collection",
+      notes =
+          "For a given CollectionName, delete  the active and passive collections",
+      code = 202,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 202, response = Response.class, message = "")
+      })
+  @DeleteMapping("/cloud/{cluster}/alias/deleteAll")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public Response deleteAliases(@ValidCluster @PathVariable("cluster") String cluster) {
+
+    return lightningService.deleteAllAliases(cluster);
+  }
+
+  @ApiOperation(
+      value = "API for backing up all SOLR collections",
+      notes =
+          "backup all  the active and passive collections",
+      code = 201,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 201, response = Response.class, message = "")
+      })
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping("/cloud/{cluster}/backup/all")
+  public Response backupAll(@ValidCluster @PathVariable("cluster") String cluster) {
+
+    return lightningService.backUpAllCollection(cluster);
+  }
+
+  @ApiOperation(
+      value = "API for backing up a SOLR collection",
+      notes =
+          "For a given CollectionName, backup  the collection",
+      code = 201,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 201, response = Response.class, message = "")
+      })
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping("/cloud/{cluster}/backup/{collectionName}")
+  public Response backupCollection(@ValidCluster @PathVariable("cluster") String cluster,
+      @ValidCollectionName @PathVariable("collectionName") String collectionName) {
+
+    return lightningService.backUpCollection(cluster, collectionName);
+  }
+
+  @ApiOperation(
+      value = "API for restoring  al SOLR collections from a repo",
+      notes =
+          "For a given Repo name, restore all the collections",
+      code = 200,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 200, response = Response.class, message = "")
+      })
+  @PostMapping("/cloud/{cluster}/restore/all")
+  public Response restoreAll(@ValidCluster @PathVariable("cluster") String cluster,
+      @RequestParam(name = "repo") String repo) {
+
+    return lightningService.restoreAllCollection(cluster, repo);
+  }
+
+  @ApiOperation(
+      value = "API for restoring backup of a SOLR collection",
+      notes =
+          "For a given CollectionName, restore the collection from the mentioned repo",
+      code = 200,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 200, response = Response.class, message = "")
+      })
+  @PostMapping("/cloud/{cluster}/restore/{collectionName}")
+  public Response restoreCollection(
+      @ValidCollectionName @PathVariable("collectionName") String collectionName,
+      @ValidCluster @PathVariable("cluster") String cluster,
+      @RequestParam(name = "repo") String repo) {
+
+    return lightningService.restoreCollection(cluster, repo, collectionName);
+  }
+
+  @ApiOperation(
+      value = "API for listing all  SOLR backups ",
+      code = 200,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 200, response = Response.class, message = "")
+      })
+  @GetMapping("/cloud/{cluster}/backup")
+  public Response listAllbackup(@ValidCluster @PathVariable("cluster") String cluster) {
+
+    return lightningService.listAllBackUp(cluster);
   }
 
 
@@ -203,7 +388,7 @@ public class CloudLightningController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @GetMapping("/clusters")
+  @GetMapping("/cloud/clusters")
   public Response listAllClusters() {
 
     return lightningService.listAllClusters();
@@ -225,10 +410,10 @@ public class CloudLightningController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @PostMapping("/{cluster}/config/{collectionName}/push")
+  @PostMapping("/cloud/{cluster}/config/{collectionName}/push")
   @ResponseStatus(HttpStatus.OK)
   public Response pushConfig(@ValidCluster @PathVariable("cluster") String cluster,
-      @PathVariable("collectionName") String collectionName,
+      @ValidCollectionNameForAlias @PathVariable("collectionName") String collectionName,
       @RequestParam(name = "reload", defaultValue = "false") boolean reload,
       @RequestParam(name = "configName") String configName,
       @RequestParam(name = "appendDir", required = false) String appendDir,
@@ -254,36 +439,12 @@ public class CloudLightningController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @DeleteMapping("/{cluster}/{collectionName}/deleteData")
+  @DeleteMapping("/cloud/{cluster}/{collectionName}/deleteData")
   @ResponseStatus(HttpStatus.OK)
   public Response deleteData(@ValidCluster @PathVariable("cluster") String cluster,
       @ValidCollectionName @PathVariable("collectionName") String collectionName,
       @RequestParam(name = "commit", defaultValue = "false") boolean commit) {
     return lightningService.deleteCollectionData(cluster, collectionName, commit);
-  }
-
-  @ApiOperation(
-      value = "API for Change Config data from SOLR collection",
-      notes =
-          "For a given CollectionName, change config from the "
-              + "collecion of a cluster",
-      code = 200,
-      response = Response.class)
-  @ApiResponses(
-      value = {
-          @ApiResponse(
-              code = 400,
-              message = "Solr Cloud Manager exceptions",
-              response = Response.class),
-          @ApiResponse(code = 200, response = Response.class, message = "")
-      })
-  @PostMapping("/{cluster}/{collectionName}/changeConfig")
-  @ResponseStatus(HttpStatus.OK)
-  public Response changeConfigSet(@ValidCluster @PathVariable("cluster") String cluster,
-      @ValidCollectionName @PathVariable("collectionName") String collectionName,
-      @RequestParam(name = "configName") String configName,
-      @RequestParam(name = "configValue") String value) {
-    return lightningService.changeConfigSet(cluster, collectionName, configName, value);
   }
 
 }

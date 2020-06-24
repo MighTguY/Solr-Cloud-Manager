@@ -1,16 +1,15 @@
 
 package io.github.mightguy.cloud.manager.manager;
 
-
 import static io.github.mightguy.cloud.manager.util.Constants.BACKUP_CREATED;
 import static io.github.mightguy.cloud.manager.util.Constants.BACKUP_RESTORED;
 import static io.github.mightguy.cloud.manager.util.Constants.PATH_DELIM;
 
 import io.github.mightguy.cloud.manager.config.LightningContext;
-import io.github.mightguy.cloud.manager.exception.ExceptionCode;
-import io.github.mightguy.cloud.manager.exception.SolrException;
 import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.util.CloudInitializerUtils;
+import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
+import io.github.mightguy.cloud.solr.commons.exception.SolrException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class DataBackupManagerService {
+public class DataBackupManager {
 
 
   @Autowired

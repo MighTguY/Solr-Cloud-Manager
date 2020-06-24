@@ -1,5 +1,5 @@
 
-package io.github.mightguy.cloud.manager.config;
+package io.github.mightguy.cloud.solr.commons.config;
 
 import org.apache.solr.client.solrj.SolrClient;
 

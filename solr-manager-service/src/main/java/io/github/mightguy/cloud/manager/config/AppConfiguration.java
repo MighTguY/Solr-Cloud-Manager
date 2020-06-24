@@ -1,8 +1,10 @@
 
 package io.github.mightguy.cloud.manager.config;
 
+
 import io.github.mightguy.cloud.manager.config.AppConfig.ZkCluster;
 import io.github.mightguy.cloud.manager.util.CloudInitializerUtils;
+import io.github.mightguy.cloud.solr.commons.config.ZkConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,7 +1,7 @@
 
-package io.github.mightguy.cloud.manager.config;
+package io.github.mightguy.cloud.solr.commons.config;
 
-import io.github.mightguy.cloud.manager.util.Constants;
+import io.github.mightguy.cloud.solr.commons.utils.Constants;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -84,15 +84,11 @@ public class RemoteSolrClientFactory implements SolrClientFactory {
     String zkChroot = zkConfig.getChRoot();
     Integer zkClientTimeout = zkConfig.getZkClientTimeout();
     Integer zkConnectTimeout = zkConfig.getZkConnectTimeout();
-    Integer socketTimeout =
-        zkConfig.getSolrSOTimeout() == null ? zkClientTimeout : zkConfig.getSolrSOTimeout();
     solrClient = new CloudSolrClient.Builder(Collections.singletonList(zkHost),
         Optional.of(zkChroot))
-        .withSocketTimeout(socketTimeout)
         .build();
     ((CloudSolrClient) solrClient).setZkClientTimeout(zkClientTimeout);
     ((CloudSolrClient) solrClient).setZkConnectTimeout(zkConnectTimeout);
-
   }
 
   /**

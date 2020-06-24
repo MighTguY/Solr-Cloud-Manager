@@ -1,9 +1,9 @@
 
 package io.github.mightguy.cloud.manager.manager;
 
-import io.github.mightguy.cloud.manager.exception.ExceptionCode;
-import io.github.mightguy.cloud.manager.exception.SolrCloudException;
-import io.github.mightguy.cloud.manager.exception.SolrException;
+import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
+import io.github.mightguy.cloud.solr.commons.exception.SolrCloudException;
+import io.github.mightguy.cloud.solr.commons.exception.SolrException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -94,6 +94,7 @@ public class SolrCloudmanagerHelper {
       return new File(location);
     }
   }
+
 
 
 }

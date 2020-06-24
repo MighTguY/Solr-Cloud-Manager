@@ -54,7 +54,7 @@ public @interface ValidCollectionName {
     private boolean isValidCollection(String value) {
       return !StringUtils.isEmpty(value)
           && !CollectionUtils.isEmpty(lightningContext.getCollectionListClusterMap()
-          .get(lightningContext.getDummyActiveCluster())) && lightningContext
+              .get(lightningContext.getDummyActiveCluster())) && lightningContext
           .getCollectionListClusterMap().get(lightningContext.getDummyActiveCluster())
           .contains(value);
     }

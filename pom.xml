@@ -65,8 +65,17 @@
 
   <modules>
     <module>solr-manager-service</module>
+    <module>solr-commons</module>
   </modules>
 
+
+  <dependencies>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+    </dependency>
+  </dependencies>
 
   <dependencyManagement>
     <dependencies>
@@ -159,6 +168,11 @@
             <artifactId>netty-all</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>21.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -476,4 +490,3 @@
 
 
 </project>
-

@@ -1,4 +1,4 @@
-package io.github.mightguy.cloud.manager.config;
+package io.github.mightguy.cloud.solr.commons.config;
 
 import lombok.Builder;
 import lombok.Data;
@@ -12,5 +12,4 @@ public class ZkConfiguration {
   private String chRoot;
   private Integer zkConnectTimeout;
   private Integer zkClientTimeout;
-  private Integer solrSOTimeout;
 }

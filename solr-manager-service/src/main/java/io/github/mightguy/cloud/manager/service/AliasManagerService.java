@@ -1,15 +1,14 @@
 
 package io.github.mightguy.cloud.manager.service;
 
-
 import io.github.mightguy.cloud.manager.config.LightningContext;
-import io.github.mightguy.cloud.manager.exception.ExceptionCode;
-import io.github.mightguy.cloud.manager.exception.SolrException;
-import io.github.mightguy.cloud.manager.exception.UnknownCollectionException;
 import io.github.mightguy.cloud.manager.manager.AliasManager;
 import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.model.SolrCollection;
 import io.github.mightguy.cloud.manager.util.Constants;
+import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
+import io.github.mightguy.cloud.solr.commons.exception.SolrException;
+import io.github.mightguy.cloud.solr.commons.exception.UnknownCollectionException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class AliasManagerService {
   /**
    * Method to getAliases for either all collections  or a specific collection
    *
-   * @return {@link io.github.mightguy.cloud.manager.model.Response}
+   * @return {@link Response}
    */
   public Response getAlias(String cluster, String collectionName) {
     Response response = new Response(HttpStatus.OK, null);
@@ -113,12 +112,5 @@ public class AliasManagerService {
     }
   }
 
-  public Response deleteAllAliases(String cluster) {
-    return aliasManager.deleteAllAliases(cluster);
-  }
-
-  public Response createAlias(String cluster, String collection, String aliasName) {
-    return aliasManager.createAliasForCollection(cluster, collection, aliasName);
-  }
 
 }
