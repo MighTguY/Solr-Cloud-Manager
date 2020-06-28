@@ -63,9 +63,9 @@ public class SolrCloudmanagerHelper {
     log.info("Using configuration sets from location : " + directoryFromConfig.getPath());
     return Arrays.stream(directoryFromConfig.listFiles())
         .filter(File::isDirectory)
-        .filter(file -> (new File(file, "src/main/resources")).exists())
+        .filter(file -> (new File(file, "resources")).exists())
         .collect(Collectors
-            .toMap(File::getName, coreDir -> new File(coreDir, "src/main/resources").toPath()));
+            .toMap(File::getName, coreDir -> new File(coreDir, "resources").toPath()));
   }
 
   public void uploadConfigs(Map<String, Path> configNameToLocationMap,

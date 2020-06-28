@@ -11,9 +11,10 @@ import io.github.mightguy.cloud.solr.commons.exception.SolrException;
 import io.github.mightguy.cloud.solr.commons.request.QueryRequestManager;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,7 @@ public class LightningContext {
   SolrConfigruationProperties solrConfigruationProperties;
 
   private Map<String, Map<String, String>> solrAliasToCollectionClusterMap;
-  private Map<String, Map<String, String>> solrCollectionToAliasClusterMap;
+  private Map<String, Map<String, Set<String>>> solrCollectionToAliasClusterMap;
   private Map<String, List<String>> collectionListClusterMap;
   private Map<String, SolrClient> solrClientClusterMap;
 
@@ -98,16 +99,23 @@ public class LightningContext {
   private void reloadAliasMap(String activeCluster) {
     SolrClient solrClient = solrClientClusterMap.get(activeCluster);
     Map<String, String> solrAliasToCollectionMap = fetchAliasMap(solrClient);
-    Map<String, String> solrCollectionToAliasMap
-        = solrAliasToCollectionMap.entrySet()
-        .stream()
-        .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (key1, key2) -> {
-          log.error("duplicate key found!");
-          return key1;
-        }));
+    Map<String, Set<String>> solrCollectionToAliasMap = fetchAliasCollectionMapping(
+        solrAliasToCollectionMap);
 
     solrAliasToCollectionClusterMap.put(activeCluster, solrAliasToCollectionMap);
     solrCollectionToAliasClusterMap.put(activeCluster, solrCollectionToAliasMap);
+  }
+
+  private Map<String, Set<String>> fetchAliasCollectionMapping(
+      Map<String, String> solrAliasToCollectionMap) {
+    Map<String, Set<String>> aliasCollectionMap = new HashMap<>();
+    solrAliasToCollectionMap.entrySet().forEach(entry -> {
+      if (!aliasCollectionMap.containsKey(entry.getKey())) {
+        aliasCollectionMap.put(entry.getValue(), new HashSet<>());
+      }
+      aliasCollectionMap.get(entry.getValue()).add(entry.getKey());
+    });
+    return aliasCollectionMap;
   }
 
   public void reload(String activeCluster) {
@@ -124,7 +132,7 @@ public class LightningContext {
     return solrAliasToCollectionClusterMap.get(activeCluster);
   }
 
-  public Map<String, String> getSolrCollectionToAliasMap(String activeCluster) {
+  public Map<String, Set<String>> getSolrCollectionToAliasMap(String activeCluster) {
     return solrCollectionToAliasClusterMap.get(activeCluster);
   }
 

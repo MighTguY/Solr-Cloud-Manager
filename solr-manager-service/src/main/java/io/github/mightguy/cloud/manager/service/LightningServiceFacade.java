@@ -76,26 +76,6 @@ public class LightningServiceFacade {
     return solrCloudManager.deleteAllAliases(cluster);
   }
 
-  public Response backUpAllCollection(String cluster) {
-    return dataBackupManager.createBackup(cluster);
-  }
-
-  public Response restoreAllCollection(String cluster, String repoPath) {
-    return dataBackupManager.restoreFullBackup(cluster, repoPath);
-  }
-
-  public Response listAllBackUp(String cluster) {
-    return dataBackupManager.listBackups(cluster);
-  }
-
-  public Response backUpCollection(String cluster, String collectionName) {
-    return dataBackupManager.createBackup(cluster, collectionName, null, null);
-  }
-
-  public Response restoreCollection(String cluster, String repo, String collectionName) {
-    return dataBackupManager.restoreBackup(cluster, repo, collectionName);
-  }
-
   public Response listAllClusters() {
     return solrCloudManager.listAllClusters();
   }

@@ -100,7 +100,8 @@ public class DataBackupManager {
     return new Response(HttpStatus.OK, null, backupRepo);
   }
 
-  public Response restoreFullBackup(String cluster, String repoName) {
+  public Response restoreFullBackup(String cluster, String repoName, boolean deleteOrignal,
+      String suffix) {
     String repoPath =
         lightningContext.getAppConfig().getBackupInfo().getBackupLocation()
             + PATH_DELIM + cluster + PATH_DELIM + repoName;
@@ -108,27 +109,28 @@ public class DataBackupManager {
       String collName = bkupCollection.replace(
           lightningContext.getAppConfig().getBackupInfo().getBackupSuffix(),
           "");
-      restoreBackup(cluster, repoName, collName);
+      restoreBackup(cluster, repoName, collName, deleteOrignal, suffix);
     });
     return new Response(HttpStatus.OK, BACKUP_RESTORED);
   }
 
   public Response restoreBackup(String cluster, String repoName,
-      String collectionName) {
+      String collectionName, boolean deleteOrignal,
+      String suffix) {
     String repoPath =
         lightningContext.getAppConfig().getBackupInfo().getBackupLocation()
             + PATH_DELIM + cluster + PATH_DELIM + repoName;
     try {
-
-      solrCloudManager
-          .deleteCollection(cluster, lightningContext.getSolrAliasToCollectionMap(cluster).get(
-              collectionName + lightningContext.getSolrConfigruationProperties()
-                  .getSuffix()
-                  .getPassive()));
+      if (deleteOrignal) {
+        solrCloudManager.deleteCollection(cluster, collectionName);
+      }
+      if (StringUtils.isEmpty(suffix)) {
+        suffix = lightningContext.getAppConfig().getBackupInfo()
+            .getRestoreSuffix();
+      }
       CollectionAdminRequest.Restore restore = CollectionAdminRequest
           .restoreCollection(
-              collectionName + lightningContext.getAppConfig().getBackupInfo()
-                  .getRestoreSuffix(),
+              collectionName + suffix,
               collectionName + lightningContext.getAppConfig().getBackupInfo()
                   .getBackupSuffix())
           .setLocation(repoPath);

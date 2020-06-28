@@ -9,7 +9,6 @@ import io.github.mightguy.cloud.manager.config.LightningContext;
 import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.util.CloudInitializerUtils;
 import io.github.mightguy.cloud.manager.util.Constants;
-
 import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
 import io.github.mightguy.cloud.solr.commons.exception.SolrCloudException;
 import io.github.mightguy.cloud.solr.commons.exception.SolrException;
@@ -150,7 +149,9 @@ public class SolrCloudManager {
   public void reloadCollections(String cluster, List<String> reloadCollections,
       boolean onlyShadow) {
     for (String collection : reloadCollections) {
-      if (lightningContext.getSolrCollectionToAliasMap(cluster).get(collection).endsWith(
+      String collectionAlias = lightningContext.getSolrCollectionToAliasMap(cluster).get(collection)
+          .stream().findFirst().get();
+      if (collectionAlias.endsWith(
           lightningContext.getSolrConfigruationProperties().getSuffix().getPassive())
           || !onlyShadow) {
         reloadCollection(cluster, collection);
@@ -209,10 +210,11 @@ public class SolrCloudManager {
 
   public Response deleteCollection(String cluster, String collectionName) {
     lightningContext.reload(cluster);
-    deleteAlias(cluster, lightningContext.getSolrCollectionToAliasMap(cluster).get(collectionName));
     if (!collectionExists(cluster, collectionName)) {
       return CloudInitializerUtils.createErrorResponse("NO SUCH COLLECTION " + collectionName);
     }
+    aliasManager.deleteAlias(cluster,
+        lightningContext.getSolrCollectionToAliasMap(cluster).get(collectionName));
     try {
       final CollectionAdminRequest.Delete deleteCollectionRequest =
           CollectionAdminRequest.deleteCollection(collectionName);

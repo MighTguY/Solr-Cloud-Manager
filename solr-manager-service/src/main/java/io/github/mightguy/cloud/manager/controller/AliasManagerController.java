@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(
     tags = {"Alias Management"}
 )
-@RequestMapping("/alias")
+@RequestMapping({"${microservice.contextPath}" + "/alias"})
 public class AliasManagerController {
 
   @Autowired
@@ -47,7 +48,7 @@ public class AliasManagerController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @GetMapping("/cloud/{cluster}/{collectionName}")
+  @GetMapping("/{cluster}/{collectionName}")
   public Response getAliasesFromSolrForCollection(
       @PathVariable("cluster") String cluster,
       @PathVariable("collectionName") String collectionName) {
@@ -69,7 +70,7 @@ public class AliasManagerController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @GetMapping("/cloud/{cluster}")
+  @GetMapping("/{cluster}")
   public Response getAllAliasesFromSolr(@PathVariable("cluster") String cluster) {
     return aliasManagerService.getAlias(cluster, "all");
   }
@@ -89,7 +90,7 @@ public class AliasManagerController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @PutMapping("/cloud/{cluster}/{collectionName}/switch")
+  @PutMapping("/{cluster}/{collectionName}/switch")
   @ResponseStatus(HttpStatus.OK)
   public Response aliasSwtich(@PathVariable("cluster") String cluster,
       @PathVariable("collectionName") String collectionName,
@@ -114,7 +115,7 @@ public class AliasManagerController {
               response = Response.class),
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
-  @PutMapping("/cloud/{cluster}/switch")
+  @PutMapping("/{cluster}/switch")
   @ResponseStatus(HttpStatus.OK)
   public Response aliasSwtichAll(@PathVariable("cluster") String cluster,
       @RequestParam(name = "reload", defaultValue = "false") boolean reload
@@ -138,7 +139,7 @@ public class AliasManagerController {
               response = Response.class),
           @ApiResponse(code = 202, response = Response.class, message = "")
       })
-  @DeleteMapping("/cloud/{cluster}/deleteAll")
+  @DeleteMapping("/{cluster}/deleteAll")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public Response deleteAliases(@PathVariable("cluster") String cluster) {
 
@@ -159,13 +160,36 @@ public class AliasManagerController {
               response = Response.class),
           @ApiResponse(code = 201, response = Response.class, message = "")
       })
-  @DeleteMapping("/cloud/{cluster}/{collectionName}/create")
+  @PostMapping("/{cluster}/{collectionName}/create")
   @ResponseStatus(HttpStatus.CREATED)
   public Response createAlias(@PathVariable("cluster") String cluster,
       @PathVariable("collectionName") String collectionName,
       @RequestParam(name = "alias", required = true) String alias) {
 
     return aliasManagerService.createAlias(cluster, collectionName, alias);
+  }
+
+  @ApiOperation(
+      value = "API for Deleting an Alias for a SOLR collection",
+      notes =
+          "For a given CollectionName, delete  the alias for  collections",
+      code = 202,
+      response = Response.class)
+  @ApiResponses(
+      value = {
+          @ApiResponse(
+              code = 400,
+              message = "Solr Cloud Manager exceptions",
+              response = Response.class),
+          @ApiResponse(code = 202, response = Response.class, message = "")
+      })
+  @DeleteMapping("/{cluster}/{collectionName}/delete")
+  @ResponseStatus(HttpStatus.CREATED)
+  public Response deleteAlias(@PathVariable("cluster") String cluster,
+      @PathVariable("collectionName") String collectionName,
+      @RequestParam(name = "alias", required = true) String alias) {
+
+    return aliasManagerService.deleteAlias(cluster, collectionName, alias);
   }
 
 

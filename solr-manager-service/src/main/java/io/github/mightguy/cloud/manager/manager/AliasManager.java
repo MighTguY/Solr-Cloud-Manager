@@ -10,12 +10,14 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import io.github.mightguy.cloud.manager.config.LightningContext;
+import io.github.mightguy.cloud.manager.model.SolrCollection;
 import io.github.mightguy.cloud.manager.util.CloudInitializerUtils;
-
 import io.github.mightguy.cloud.solr.commons.exception.ExceptionCode;
 import io.github.mightguy.cloud.solr.commons.exception.SolrCloudException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 
 /**
@@ -101,26 +104,7 @@ public class AliasManager {
    * This method is responsible for creating alias  for all the solr collections. 1. Collection
    * ending with _A , will become Live. 2. Collection ending with _B, will become Shadow.
    */
-  public void createAlias(String cluster, List<String> collections) {
-    try {
-      for (String collection : collections) {
-        String collectionAlias = CloudInitializerUtils
-            .getCurrentAliasSuffix(cluster, lightningContext, collection);
-        if (lightningContext.getSolrAliasToCollectionMap(cluster).containsKey(collectionAlias)) {
-          log.warn("Alias already present " + collectionAlias);
-          continue;
-        }
-        log.info("Creating alias : " + collectionAlias + " for collection : " + collectionAlias);
-        CollectionAdminRequest.createAlias(collectionAlias, collection)
-            .process(lightningContext.getSolrClient(cluster));
-        log.info("Alias: " + collectionAlias + " for collection: " + collectionAlias
-            + " is successfully created");
-      }
-    } catch (SolrServerException | IOException ex) {
-      log.error("Exception during collection or alias creation. ", ex);
-      throw new SolrCloudException(ExceptionCode.UNABLE_TO_CREATE_COLLECTION_ALIAS, ex);
-    }
-  }
+
 
   private void verifyHealthyStateForCluseterCollection(String cluster, String collectionName)
       throws SolrServerException, IOException {
@@ -152,5 +136,109 @@ public class AliasManager {
     }
   }
 
+  public void createAlias(String cluster, List<String> collections) {
+    try {
+      for (String collection : collections) {
+        String collectionAlias = CloudInitializerUtils
+            .getCurrentAliasSuffix(cluster, lightningContext, collection);
+        if (lightningContext.getSolrAliasToCollectionMap(cluster).containsKey(collectionAlias)) {
+          log.warn("Alias already present " + collectionAlias);
+          continue;
+        }
+        log.info("Creating alias : " + collectionAlias + " for collection : " + collectionAlias);
+        CollectionAdminRequest.createAlias(collectionAlias, collection)
+            .process(lightningContext.getSolrClient(cluster));
+        log.info("Alias: " + collectionAlias + " for collection: " + collectionAlias
+            + " is successfully created");
+      }
+    } catch (SolrServerException | IOException ex) {
+      log.error("Exception during collection or alias creation. ", ex);
+      throw new SolrCloudException(ExceptionCode.UNABLE_TO_CREATE_COLLECTION_ALIAS, ex);
+    }
+  }
 
+  public void createAlias(String cluster, String collectionName, String collectionAlias) {
+    try {
+      log.info("Creating alias : " + collectionAlias + " for collection : " + collectionName);
+      CollectionAdminRequest.createAlias(collectionAlias, collectionName)
+          .process(lightningContext.getSolrClient(cluster));
+      log.info("Alias: " + collectionAlias + " for collection: " + collectionAlias
+          + " is successfully created");
+    } catch (SolrServerException | IOException ex) {
+      log.error("Exception during collection or alias creation. ", ex);
+      throw new SolrCloudException(ExceptionCode.UNABLE_TO_CREATE_COLLECTION_ALIAS, ex);
+    }
+  }
+
+  public void deleteAlias(String cluster) {
+    Set<String> aliases = getAliasforCluster(cluster);
+    for (String alias : aliases) {
+      deleteAlias(cluster, alias);
+    }
+  }
+
+  public void deleteAlias(String cluster, String collectionName, Set<String> collectionAliases) {
+    if (CollectionUtils.isEmpty(collectionAliases)) {
+      collectionAliases = getAliasForCollection(cluster, collectionName);
+    }
+    deleteAlias(cluster, collectionAliases);
+  }
+
+  public void deleteAlias(String cluster, Set<String> collectionAliases) {
+    if (CollectionUtils.isEmpty(collectionAliases)) {
+      log.error("No such aliases found for " + cluster);
+      return;
+    }
+    for (String collectionAlias : collectionAliases) {
+      deleteAlias(cluster, collectionAlias);
+    }
+  }
+
+  public void deleteAlias(String cluster, String collectionAlias) {
+    try {
+      log.info("Deleting alias : " + collectionAlias + " for cluster : " + cluster);
+      CollectionAdminRequest.deleteAlias(collectionAlias)
+          .process(lightningContext.getSolrClient(cluster));
+      log.info("Alias: " + collectionAlias + " for cluster: " + cluster
+          + " is successfully deleted");
+    } catch (SolrServerException | IOException ex) {
+      log.error("Exception during collection or alias deletion. ", ex);
+      throw new SolrCloudException(ExceptionCode.UNABLE_TO_CREATE_COLLECTION_ALIAS, ex);
+    }
+  }
+
+  private Set<String> getAliasForCollection(String cluster, String collectionName) {
+    return lightningContext.getSolrCollectionToAliasMap(cluster).getOrDefault(collectionName, null);
+  }
+
+  private Set<String> getAliasforCluster(String cluster) {
+    return lightningContext.getSolrAliasToCollectionMap(cluster).keySet();
+  }
+
+  /**
+   * Get  Aliases for all the  collections in SOLR
+   *
+   * @return {@code HashMap}
+   */
+  public Object fetchAllCollectionAliases(String cluster) {
+
+    String activeSuffix = lightningContext.getSolrConfigruationProperties().getSuffix().getActive();
+    String passiveSuffix = lightningContext.getSolrConfigruationProperties().getSuffix()
+        .getPassive();
+
+    Map<String, SolrCollection> collectionAliasMap = new HashMap<>();
+    lightningContext.getSolrAliasToCollectionMap(cluster).entrySet().forEach(entry -> {
+      String collectionName = entry.getKey();
+      if (entry.getKey().matches(".*(" + activeSuffix + "|" + passiveSuffix + ")")) {
+        collectionName = entry.getKey()
+            .replaceAll("(" + activeSuffix + "|" + passiveSuffix + ")", "");
+      }
+      if (!collectionAliasMap.containsKey(collectionName)) {
+        collectionAliasMap.put(collectionName, new SolrCollection(collectionName));
+      }
+      collectionAliasMap.get(collectionName).getAliasesVsCollectionMap()
+          .put(entry.getKey(), entry.getValue());
+    });
+    return collectionAliasMap;
+  }
 }
