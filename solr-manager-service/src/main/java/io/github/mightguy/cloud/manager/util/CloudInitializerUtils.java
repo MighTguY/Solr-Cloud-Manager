@@ -40,6 +40,13 @@ public final class CloudInitializerUtils {
     return collectionName.substring(collectionName.lastIndexOf('_'));
   }
 
+  /**
+   * TODO
+   * @param cluster
+   * @param lightningContext
+   * @param collectionName
+   * @return
+   */
   public static String getCurrentAliasSuffix(String cluster, LightningContext lightningContext,
       String collectionName) {
 
@@ -54,7 +61,8 @@ public final class CloudInitializerUtils {
           collectionLemma + lightningContext.getSolrConfigruationProperties().getSuffix()
               .getPassive();
     } else {
-      return lightningContext.getSolrCollectionToAliasMap(cluster).get(collectionName);
+      return lightningContext.getSolrCollectionToAliasMap(cluster).get(collectionName).iterator()
+          .next();
     }
   }
 
@@ -118,5 +126,6 @@ public final class CloudInitializerUtils {
           "Unable to delete directory " + ex.getMessage());
     }
   }
+
 
 }
