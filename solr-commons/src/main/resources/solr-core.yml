@@ -8,7 +8,7 @@ solr:
   alias:
     enabled: true
   disabledFor:
-  - grocery
+  - none
   suffix:
     active: Live
     passive: Shadow
