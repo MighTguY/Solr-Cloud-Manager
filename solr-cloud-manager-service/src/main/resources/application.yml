@@ -1,0 +1,51 @@
+server.port: 8081
+microservice.contextPath: '/api/v1/'
+spring.jackson.time-zone: Europe/Berlin
+spring.jackson.serialization.indent_output: true
+server.servlet.context-path: '/solr-cloud-manager'
+management.endpoint.health.show-details: always
+info.app.name: Solr Cloud Manager
+info.app.version: 1.0.0
+management.endpoint.metrics.enabled: true
+management.health.solr.enabled: false
+management.endpoints.enabled-by-default: true
+management.security.enabled: false
+management.endpoint.prometheus.enabled: true
+management.metrics.export.prometheus.enabled: true
+spring.application.name: "Solr Cloud Manager"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+alias:
+  enabled: true
+  suffix:
+    active: "_active"
+    passive: "_passive"
+
+collectionSuffix:
+  active: "_A"
+  passive: "_B"
+
+backupInfo:
+  backupSuffix: "_backup"
+  restoreSuffix: "_restore"
+  backupLocation: "/tmp/backup"
+
+configOutPath: "/tmp/config/local"
+
+clusters:
+  default:
+    zKChroot: /
+    zkClientTimeout: 20000
+    zkConnectTimeout: 20000
+    zkUrl: "localhost:2181"
+
+defaultClusterAliasSuffixMap:
+  A: "active"
+  B: "passive"
+
+
+

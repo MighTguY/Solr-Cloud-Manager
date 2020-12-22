@@ -1,0 +1,19 @@
+solr:
+  optimize: false
+  softCommit: true
+  batchSize: 10
+  connectionType: zk
+  index.shadow.cores: true
+  alias:
+    enabled: true
+  disabledFor:
+  - temp_disabled
+  suffix:
+    active: Live
+    passive: Shadow
+  solrCoresData:
+    temp1:
+      coreName: temp
+      searchHandler: /select
+
+
