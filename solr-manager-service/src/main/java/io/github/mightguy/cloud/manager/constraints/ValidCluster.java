@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2018 Walmart Co. All rights reserved.
- */
-
 package io.github.mightguy.cloud.manager.constraints;
 
 import static java.lang.annotation.ElementType.FIELD;

@@ -8,7 +8,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>solr-cloud-manager-service</artifactId>
+  <artifactId>solr-manager-service</artifactId>
 
   <dependencies>
     <dependency>

@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2018 Walmart Co. All rights reserved.
- */
-
 package io.github.mightguy.cloud.manager.constraints;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -10,6 +6,8 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import io.github.mightguy.cloud.manager.constraints.ValidValue.ValidateValue;
+import io.github.mightguy.cloud.manager.model.request.ClusterInitializationType;
+import io.github.mightguy.cloud.manager.model.request.InitializationRequestDetails;
 import io.github.mightguy.cloud.manager.util.Constants;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -18,7 +16,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
-import org.apache.solr.common.StringUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * ValidUser annotation for validation of user name/password Each custom annotation must have
@@ -29,7 +27,7 @@ import org.apache.solr.common.StringUtils;
 @Retention(RUNTIME)
 @Documented
 @Constraint(validatedBy = ValidateValue.class)
-public @interface ValidValue {
+public @interface ValidInitializationPayload {
 
   String message() default Constants.INVALID_VALUE;
 
@@ -41,16 +39,24 @@ public @interface ValidValue {
    * ClusterValidator class responsible for validating CollectionName.
    */
   public static class ValidateValue implements
-      ConstraintValidator<ValidValue, String> {
+      ConstraintValidator<ValidInitializationPayload, InitializationRequestDetails> {
 
 
     @Override
-    public final boolean isValid(String value, ConstraintValidatorContext context) {
-      return isValidUser(value);
+    public final boolean isValid(InitializationRequestDetails payload,
+        ConstraintValidatorContext context) {
+      return ((payload.getType().equals(ClusterInitializationType.GIT)
+          && (payload.getGithubDetails() == null
+          || StringUtils.isEmpty(payload.getGithubDetails().getGithubProjectName())
+          || StringUtils.isEmpty(payload.getGithubDetails().getGithubPassword())
+          || StringUtils.isEmpty(payload.getGithubDetails().getGithubUsername())
+          || StringUtils.isEmpty(payload.getGithubDetails().getGithubRepoURL())))
+          ||
+          ((payload.getType().equals(ClusterInitializationType.LOCAL)) && (
+              payload.getLocalDetails() == null
+                  || StringUtils.isEmpty(payload.getLocalDetails().getLocalFilePath())
+          )));
     }
 
-    private boolean isValidUser(String value) {
-      return !StringUtils.isEmpty(value);
-    }
   }
 }
