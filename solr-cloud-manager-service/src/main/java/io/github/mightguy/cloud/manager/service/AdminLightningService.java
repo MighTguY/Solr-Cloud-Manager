@@ -26,8 +26,8 @@ public class AdminLightningService {
       boolean uploadZkConf, ClusterInitializationType type,
       InitializationRequestDetails payload) {
 
-    validator.
-        validateInitializeCloudRequest(cluster, deleteOldCollections, uploadZkConf, type, payload);
+    validator
+        .validateInitializeCloudRequest(cluster, deleteOldCollections, uploadZkConf, type, payload);
     solrClusterManager
         .initializeSolrCluster(cluster, deleteOldCollections, uploadZkConf, type, payload);
     return new Response(HttpStatus.CREATED, Constants.SOLR_CLOUD_SUCCESSFULLY_INITIALIZED);

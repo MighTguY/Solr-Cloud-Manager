@@ -27,7 +27,8 @@ public enum ExceptionCode {
   UNABLE_TO_CREATE_COLLECTION("Exception during collection creation.",
       HttpStatus.BAD_REQUEST),
   UNABLE_TO_RELOAD_COLLECTION("Exception during reload collection", HttpStatus.BAD_REQUEST),
-  UNABLE_TO_DELETE_COLLECTION_DATA("Exception during deleting collection data", HttpStatus.BAD_REQUEST),
+  UNABLE_TO_DELETE_COLLECTION_DATA("Exception during deleting collection data",
+      HttpStatus.BAD_REQUEST),
   UNABLE_TO_DELETE_COLLECTION("Exception during deleting collection data", HttpStatus.BAD_REQUEST),
   CLUSTER_UNHEALTHY("Cluster is not in healthy state", HttpStatus.INTERNAL_SERVER_ERROR);
 

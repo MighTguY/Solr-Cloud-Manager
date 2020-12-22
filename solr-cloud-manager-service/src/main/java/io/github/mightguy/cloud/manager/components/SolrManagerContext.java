@@ -66,13 +66,8 @@ public class SolrManagerContext {
         .collect(Collectors.toList());
 
     clusterToAliasMap
-        .put(cluster,
-            aliases.stream().collect(
-                Collectors.toMap(alias ->
-                        alias.getAlias(),
-                    alias -> alias,
-                    (a1, a2) -> a1))
-        );
+        .put(cluster, aliases.stream().collect(
+                Collectors.toMap(alias -> alias.getAlias(), alias -> alias, (a1, a2) -> a1)));
     clusterToCollectionMap.put(cluster, collectionMap);
 
   }
@@ -92,13 +87,12 @@ public class SolrManagerContext {
         "SolrCloudClient is only supported");
   }
 
+  public Collection<SolrCollection> getSolrCollections(String cluster) {
+    return clusterToCollectionMap.get(cluster).values();
+  }
 
   public Collection<Alias> getSolrAlias(String cluster) {
     return clusterToAliasMap.get(cluster).values();
-  }
-
-  public Collection<SolrCollection> getSolrCollections(String cluster) {
-    return clusterToCollectionMap.get(cluster).values();
   }
 
   public Alias getSolrAlias(String cluster, String collection) {
