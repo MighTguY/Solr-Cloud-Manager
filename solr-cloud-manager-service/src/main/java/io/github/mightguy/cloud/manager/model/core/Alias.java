@@ -8,7 +8,7 @@ import lombok.Data;
 public class Alias {
 
   private String alias;
-  private SolrCollection collections;
+  private String collection;
   private boolean isActive;
   private boolean isPassive;
 }

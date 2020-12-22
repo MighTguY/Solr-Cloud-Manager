@@ -4,12 +4,13 @@ package io.github.mightguy.cloud.manager.controller.impl;
 import static io.github.mightguy.cloud.manager.util.Constants.CLUSTER_NAME;
 import static io.github.mightguy.cloud.manager.util.Constants.COLLECTION_NAME;
 import static io.github.mightguy.cloud.manager.util.Constants.DELETE_OLD_COLLECTIONS;
-import static io.github.mightguy.cloud.manager.util.Constants.INITIALIZATION_TYPE;
 import static io.github.mightguy.cloud.manager.util.Constants.UPLOAD_CONFIG_TO_ZOOKEEPER;
 
+import io.github.mightguy.cloud.manager.constraints.ValidCluster;
+import io.github.mightguy.cloud.manager.constraints.ValidInitializationPayload;
+import io.github.mightguy.cloud.manager.constraints.ValidValue;
 import io.github.mightguy.cloud.manager.controller.AdminLightningController;
 import io.github.mightguy.cloud.manager.model.Response;
-import io.github.mightguy.cloud.manager.model.request.ClusterInitializationType;
 import io.github.mightguy.cloud.manager.model.request.InitializationRequestDetails;
 import io.github.mightguy.cloud.manager.service.AdminLightningService;
 import io.swagger.annotations.ApiOperation;
@@ -69,14 +70,13 @@ public class AdminLightningControllerImpl implements AdminLightningController {
   @PostMapping("/cloud/{cluster}/initialize")
   @ResponseStatus(HttpStatus.CREATED)
   public Response doInitializeSolrCloud(
-      @PathVariable(CLUSTER_NAME) String cluster,
+      @ValidCluster @PathVariable(CLUSTER_NAME) String cluster,
       @RequestParam(name = DELETE_OLD_COLLECTIONS, required = false) boolean deleteOldCollections,
       @RequestParam(name = UPLOAD_CONFIG_TO_ZOOKEEPER, required = false) boolean uploadZkConf,
-      @RequestParam(name = INITIALIZATION_TYPE) ClusterInitializationType type,
-      @RequestBody InitializationRequestDetails payload) {
+      @ValidInitializationPayload @RequestBody InitializationRequestDetails payload) {
 
     return lightningService
-        .initializeCloud(cluster, deleteOldCollections, uploadZkConf, type, payload);
+        .initializeCloud(cluster, deleteOldCollections, uploadZkConf, payload.getType(), payload);
   }
 
 
@@ -101,8 +101,9 @@ public class AdminLightningControllerImpl implements AdminLightningController {
       })
   @PutMapping("/cloud/{cluster}/{collection}/reload")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Response reloadCollection(@PathVariable(CLUSTER_NAME) String cluster,
-      @PathVariable(name = COLLECTION_NAME) String collectionName,
+  public Response reloadCollection(
+      @ValidCluster @PathVariable(CLUSTER_NAME) String cluster,
+      @ValidValue @PathVariable(name = COLLECTION_NAME) String collectionName,
       @RequestParam(name = "only_passive", required = false) boolean onlyPassiveReload) {
 
     return lightningService.reloadCollection(cluster, collectionName, onlyPassiveReload);
@@ -129,7 +130,8 @@ public class AdminLightningControllerImpl implements AdminLightningController {
       })
   @PutMapping("/cloud/{cluster}/reload")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Response reloadCluster(@PathVariable(CLUSTER_NAME) String cluster,
+  public Response reloadCluster(
+      @ValidCluster @PathVariable(CLUSTER_NAME) String cluster,
       @RequestParam(name = "only_passive", required = false) boolean onlyPassiveReload) {
 
     return lightningService.reloadCluster(cluster, onlyPassiveReload);
@@ -154,7 +156,8 @@ public class AdminLightningControllerImpl implements AdminLightningController {
           @ApiResponse(code = 200, response = Response.class, message = "")
       })
   @GetMapping("/cloud/{cluster}/collections")
-  public Response getCollections(@PathVariable(CLUSTER_NAME) String cluster) {
+  public Response getCollections(
+      @ValidCluster @PathVariable(CLUSTER_NAME) String cluster) {
     return lightningService.listCollections(cluster);
   }
 
@@ -178,7 +181,8 @@ public class AdminLightningControllerImpl implements AdminLightningController {
       })
   @ResponseStatus(HttpStatus.ACCEPTED)
   @DeleteMapping("/cloud/{cluster}/deleteAll")
-  public Response deleteAllCollections(@PathVariable(CLUSTER_NAME) String cluster) {
+  public Response deleteAllCollections(
+      @ValidCluster @PathVariable(CLUSTER_NAME) String cluster) {
     return lightningService.deleteCluster(cluster);
   }
 
@@ -203,8 +207,9 @@ public class AdminLightningControllerImpl implements AdminLightningController {
       })
   @DeleteMapping("/cloud/{cluster}/{collection}/delete")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Response deleteCollection(@PathVariable(CLUSTER_NAME) String cluster,
-      @PathVariable("collection") String collection
+  public Response deleteCollection(
+      @ValidCluster @PathVariable(CLUSTER_NAME) String cluster,
+      @ValidValue @PathVariable("collection") String collection
   ) {
     return lightningService.deleteCollections(cluster, collection);
   }
@@ -243,8 +248,9 @@ public class AdminLightningControllerImpl implements AdminLightningController {
       })
   @DeleteMapping("/cloud/{cluster}/{collectionName}/deleteData")
   @ResponseStatus(HttpStatus.OK)
-  public Response deleteData(@PathVariable(CLUSTER_NAME) String cluster,
-      @PathVariable("collectionName") String collectionName,
+  public Response deleteData(
+      @ValidCluster @PathVariable(CLUSTER_NAME) String cluster,
+      @ValidValue @PathVariable("collectionName") String collectionName,
       @RequestParam(name = "commit", defaultValue = "false") boolean commit) {
     return lightningService.deleteData(cluster, collectionName, commit);
   }

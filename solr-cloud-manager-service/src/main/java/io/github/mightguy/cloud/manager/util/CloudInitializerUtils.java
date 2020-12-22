@@ -114,7 +114,7 @@ public final class CloudInitializerUtils {
     if (originalCollectionName) {
       return collectionName;
     }
-    return collectionName.concat("_").concat(suffix);
+    return collectionName.concat(suffix);
   }
 
 

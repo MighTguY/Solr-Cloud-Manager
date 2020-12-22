@@ -1,16 +1,15 @@
 
 package io.github.mightguy.cloud.manager.controller;
 
-import io.github.mightguy.cloud.manager.model.request.ClusterInitializationType;
-import io.github.mightguy.cloud.manager.model.request.InitializationRequestDetails;
 import io.github.mightguy.cloud.manager.model.Response;
+import io.github.mightguy.cloud.manager.model.request.InitializationRequestDetails;
 
 
 public interface AdminLightningController {
 
 
   Response doInitializeSolrCloud(String cluster, boolean deleteOldCollections,
-      boolean uploadZkConf, ClusterInitializationType type, InitializationRequestDetails payload);
+      boolean uploadZkConf, InitializationRequestDetails payload);
 
 
   Response reloadCollection(String cluster, String collectionName,

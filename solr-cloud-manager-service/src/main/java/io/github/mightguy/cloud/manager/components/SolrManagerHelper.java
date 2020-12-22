@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -44,19 +45,19 @@ public class SolrManagerHelper {
   public Set<String> fetchCollections(SolrClient solrClient) {
     ModifiableSolrParams params = new ModifiableSolrParams();
     params.set("action", CollectionAction.LIST.toString());
-    SolrRequest request = new QueryRequest(params);
+    SolrRequest<QueryResponse> request = new QueryRequest(params);
     request.setPath("/admin/collections");
     QueryResponse queryResponse = solrQueryComponent.getQueryReponse(request, solrClient);
     if (queryResponse == null) {
       return new HashSet<>();
     }
-    return (Set<String>) queryResponse.getResponse().get("collections");
+    return new HashSet<>(((List<String>) queryResponse.getResponse().get("collections")));
   }
 
   public Map<String, String> fetchAliases(SolrClient solrClient) {
     ModifiableSolrParams params = new ModifiableSolrParams();
     params.set("action", CollectionAction.LISTALIASES.toString());
-    SolrRequest request = new QueryRequest(params);
+    SolrRequest<QueryResponse> request = new QueryRequest(params);
     request.setPath("/admin/collections");
     QueryResponse queryResponse = solrQueryComponent.getQueryReponse(request, solrClient);
     if (queryResponse == null) {

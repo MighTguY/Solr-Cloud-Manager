@@ -16,5 +16,5 @@ public interface AliasController {
 
   public Response createAlias(String cluster, String collectionName, String alias);
 
-  public Response deleteAlias(String cluster, String collectionName, String alias);
+  public Response deleteAlias(String cluster, String alias);
 }

@@ -2,7 +2,6 @@ package io.github.mightguy.cloud.manager.components.manager;
 
 import static io.github.mightguy.cloud.manager.util.CloudInitializerUtils.checkCloudSolrClientInstance;
 import static io.github.mightguy.cloud.manager.util.CloudInitializerUtils.collectionNameWithSuffix;
-import static io.github.mightguy.cloud.manager.util.CloudInitializerUtils.deleteDir;
 import static io.github.mightguy.cloud.manager.util.CloudInitializerUtils.extractGitLocation;
 import static io.github.mightguy.cloud.manager.util.CloudInitializerUtils.extractLocalLocation;
 import static io.github.mightguy.cloud.manager.util.CloudInitializerUtils.readConfigNameLocations;
@@ -73,14 +72,20 @@ public class SolrClusterManager {
     Map<String, Path> confPath = readConfigNameLocations(
         appConfig.getConfigOutPath() + Constants.SLASH + folderName);
 
+    if (confPath.size() < 1) {
+      throw new SolrCommonsException(ExceptionCode.UNKNOWN_TO_LOAD_CONFIG,
+          "config folder is empty");
+    }
+
     if (uploadZkConf) {
       solrManagerHelper.uploadConfigs(confPath, solrManagerContext.getConfigManager(cluster));
     }
+
     List<String> collections = createCollections(cluster, confPath, true, payload.getCoreDetails(),
         deleteOldCollections);
     reloadApp();
     reloadCollections(cluster, collections, false);
-    deleteDir(appConfig.getConfigOutPath() + Constants.SLASH + folderName);
+    //deleteDir(appConfig.getConfigOutPath() + Constants.SLASH + folderName);
   }
 
   public List<String> createCollections(String cluster, Map<String, Path> confPath,
@@ -132,6 +137,7 @@ public class SolrClusterManager {
       if (deleteOldCollections) {
         deleteCollection(cluster, collectionNameToCreate);
       }
+      reloadApp();
       if (solrManagerContext.isCollectionAlreadyPresent(cluster, collectionNameToCreate)) {
         log.warn("Collection already present " + collectionNameToCreate);
         return collectionNameToCreate;

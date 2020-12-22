@@ -1,5 +1,7 @@
 package io.github.mightguy.cloud.manager.controller.impl;
 
+import io.github.mightguy.cloud.manager.constraints.ValidCluster;
+import io.github.mightguy.cloud.manager.constraints.ValidValue;
 import io.github.mightguy.cloud.manager.controller.AliasController;
 import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.service.SolrAliasService;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -59,8 +62,8 @@ public class AliasControllerImpl implements AliasController {
   @GetMapping("/{cluster}/{collectionName}")
   @Override
   public Response getAliasesFromSolrForCollection(
-      @PathVariable("cluster") String cluster,
-      @PathVariable("collectionName") String collectionName) {
+      @ValidCluster @PathVariable("cluster") String cluster,
+      @ValidValue @PathVariable("collectionName") String collectionName) {
     return solrAliasService.getAlias(cluster, collectionName);
   }
 
@@ -83,7 +86,7 @@ public class AliasControllerImpl implements AliasController {
       })
   @GetMapping("/{cluster}")
   @Override
-  public Response getAllAliasesFromSolr(@PathVariable("cluster") String cluster) {
+  public Response getAllAliasesFromSolr(@ValidCluster @PathVariable("cluster") String cluster) {
     return solrAliasService.getAlias(cluster, Constants.ALL_COLLECTIONS);
   }
 
@@ -109,10 +112,10 @@ public class AliasControllerImpl implements AliasController {
   @ResponseStatus(HttpStatus.OK)
   @Override
   public Response aliasSwitch(
-      @PathVariable("collectionName") String cluster,
-      @PathVariable("cluster") String collectionName,
+      @ValidCluster @PathVariable("cluster") String cluster,
+      @ValidValue @PathVariable("collectionName") String collectionName,
       @RequestParam(name = "reload", defaultValue = "true") boolean reload) {
-    return null;
+    return solrAliasService.switchAlias(cluster, collectionName, reload);
   }
 
   @ApiOperation(
@@ -137,7 +140,7 @@ public class AliasControllerImpl implements AliasController {
   @ResponseStatus(HttpStatus.OK)
   @Override
   public Response aliasSwitchAll(
-      @PathVariable("cluster") String cluster,
+      @ValidCluster @PathVariable("cluster") String cluster,
       @RequestParam(name = "reload", defaultValue = "false") boolean reload) {
     return solrAliasService.switchAlias(cluster, Constants.ALL_COLLECTIONS, reload);
   }
@@ -163,7 +166,7 @@ public class AliasControllerImpl implements AliasController {
   @DeleteMapping("/{cluster}/deleteAll")
   @ResponseStatus(HttpStatus.ACCEPTED)
   @Override
-  public Response deleteAliases(@PathVariable("cluster") String cluster) {
+  public Response deleteAliases(@ValidCluster @PathVariable("cluster") String cluster) {
     return solrAliasService.deleteAllAliases(cluster);
   }
 
@@ -189,9 +192,9 @@ public class AliasControllerImpl implements AliasController {
   @ResponseStatus(HttpStatus.CREATED)
   @Override
   public Response createAlias(
-      @PathVariable("cluster") String cluster,
-      @PathVariable("collectionName") String collectionName,
-      @RequestParam(name = "alias") String alias) {
+      @ValidCluster @PathVariable("cluster") String cluster,
+      @ValidValue @PathVariable("collectionName") String collectionName,
+      @ValidValue @RequestParam(name = "alias") String alias) {
     return solrAliasService.createAlias(cluster, collectionName, alias);
   }
 
@@ -217,9 +220,8 @@ public class AliasControllerImpl implements AliasController {
   @ResponseStatus(HttpStatus.CREATED)
   @Override
   public Response deleteAlias(
-      @PathVariable("cluster") String cluster,
-      @PathVariable("collectionName") String collectionName,
-      @RequestParam(name = "alias") String alias) {
+      @ValidCluster @PathVariable("cluster") String cluster,
+      @ValidValue @PathVariable("collectionName") String alias) {
     return solrAliasService.deleteAlias(cluster, alias);
   }
 }

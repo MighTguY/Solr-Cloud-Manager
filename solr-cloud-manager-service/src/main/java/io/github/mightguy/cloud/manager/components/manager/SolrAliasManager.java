@@ -55,10 +55,15 @@ public class SolrAliasManager {
   public Collection<Alias> getAlias(String cluster, String collectionName) {
     Collection<Alias> aliases = new ArrayList<>();
     aliases.add(solrManagerContext.getSolrAlias(cluster, collectionName));
+    aliases.add(
+        solrManagerContext.getSolrAlias(cluster, CloudInitializerUtils.collectionNameWithSuffix(
+            collectionName, appConfig.getCollectionSuffix().getActive(), false
+        )));
     aliases.add(solrManagerContext.getSolrAlias(cluster,
-        collectionName.concat(appConfig.getAlias().getSuffix().getPassive())));
-    aliases.add(solrManagerContext.getSolrAlias(cluster,
-        collectionName.concat(appConfig.getAlias().getSuffix().getActive())));
+        CloudInitializerUtils.collectionNameWithSuffix(
+            collectionName, appConfig.getCollectionSuffix().getPassive(), false
+        )
+    ));
     return aliases.stream().filter(Objects::nonNull).collect(Collectors.toList());
   }
 
@@ -106,31 +111,35 @@ public class SolrAliasManager {
     solrManagerHelper
         .verifyHealthyStateForClusterCollection(CloudInitializerUtils
                 .checkCloudSolrClientInstance(solrManagerContext.getSolrClient(cluster)),
-            shadowAlias.getCollections().getName());
+            shadowAlias.getCollection());
     solrManagerHelper
         .verifyHealthyStateForClusterCollection(CloudInitializerUtils
                 .checkCloudSolrClientInstance(solrManagerContext.getSolrClient(cluster)),
-            liveAlias.getCollections().getName());
+            liveAlias.getCollection());
 
     log.info("Replacing existing live alias : {} to point on collection : {}.",
         liveAlias.getAlias(),
-        shadowAlias.getCollections().getName());
-    CollectionAdminRequest.createAlias(liveAlias.getAlias(), shadowAlias.getCollections().getName())
+        shadowAlias.getCollection());
+    CollectionAdminRequest.createAlias(liveAlias.getAlias(), shadowAlias.getCollection())
         .process(solrManagerContext.getSolrClient(cluster));
     log.info("Replacing existing live alias : {} to point on collection : {}.",
         shadowAlias.getAlias(),
-        liveAlias.getCollections().getName());
-    CollectionAdminRequest.createAlias(shadowAlias.getAlias(), liveAlias.getCollections().getName())
+        liveAlias.getCollection());
+    CollectionAdminRequest.createAlias(shadowAlias.getAlias(), liveAlias.getCollection())
         .process(solrManagerContext.getSolrClient(cluster));
 
     if (reload) {
       log.info("Reloading collection {} against possibly new configuration set.", collectionName);
       solrManagerContext.getSolrClient(cluster)
-          .request(CollectionAdminRequest.reloadCollection(liveAlias.getCollections().getName()));
+          .request(CollectionAdminRequest.reloadCollection(liveAlias.getCollection()));
     }
     log.info(
         "Successfully switched aliases for collection : {} .", collectionName);
 
+  }
+
+  public void refresh() {
+    solrManagerContext.reloadContext();
   }
 
 }

@@ -27,5 +27,8 @@ public final class Constants {
   public static final String PATH_DELIM = "/";
   public static final String BACKUP_CREATED = "Backup Created";
   public static final String BACKUP_RESTORED = "Backup fully restored";
+  public static final String INVALID_CLUSTER = "INVALID CLUSTER TO CONNECT";
+  public static final String INVALID_VALUE = "INVALID VALUE";
+  public static final String INVALID_COLLECTION = "INVALID COLLECTION TO QUERY";
 
 }

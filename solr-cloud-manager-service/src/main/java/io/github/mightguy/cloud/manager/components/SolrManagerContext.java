@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.common.StringUtils;
 import org.apache.solr.common.cloud.ZkConfigManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -51,12 +51,13 @@ public class SolrManagerContext {
     List<Alias> aliases = solrManagerHelper
         .fetchAliases(clusterToSolrClientMap.get(cluster)).entrySet().stream()
         .map(entry -> {
-          boolean isActive = entry.getKey().endsWith(appConfig.getCollectionSuffix().getActive());
-          boolean isPassive = entry.getKey().endsWith(appConfig.getCollectionSuffix().getPassive());
+          boolean isActive = entry.getKey().endsWith(appConfig.getAlias().getSuffix().getActive());
+          boolean isPassive = entry.getKey()
+              .endsWith(appConfig.getAlias().getSuffix().getPassive());
 
           Alias alias = new Alias(
               entry.getKey(),
-              collectionMap.get(entry.getValue()),
+              collectionMap.get(entry.getValue()).getName(),
               isActive,
               isPassive);
           collectionMap.get(entry.getValue()).setAlias(alias);
@@ -101,7 +102,12 @@ public class SolrManagerContext {
   }
 
   public Alias getSolrAlias(String cluster, String collection) {
-    return clusterToCollectionMap.get(cluster).get(collection).getAlias();
+    SolrCollection solrCollection = clusterToCollectionMap.get(cluster)
+        .getOrDefault(collection, null);
+    if (null == solrCollection) {
+      return null;
+    }
+    return solrCollection.getAlias();
   }
 
   public boolean isCollectionAlreadyPresent(String cluster, String collection) {
@@ -145,5 +151,9 @@ public class SolrManagerContext {
       }
       return col;
     }).collect(Collectors.toList());
+  }
+
+  public boolean isValidCluster(String value) {
+    return !StringUtils.isEmpty(value) && appConfig.getClusters().containsKey(value);
   }
 }

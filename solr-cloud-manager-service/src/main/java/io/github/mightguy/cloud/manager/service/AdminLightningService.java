@@ -2,9 +2,9 @@ package io.github.mightguy.cloud.manager.service;
 
 import io.github.mightguy.cloud.manager.components.Validator;
 import io.github.mightguy.cloud.manager.components.manager.SolrClusterManager;
+import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.model.request.ClusterInitializationType;
 import io.github.mightguy.cloud.manager.model.request.InitializationRequestDetails;
-import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.util.Constants;
 import java.util.Collections;
 import org.springframework.http.HttpStatus;
@@ -42,7 +42,7 @@ public class AdminLightningService {
   }
 
   public Response deleteCluster(String cluster) {
-    return solrClusterManager.deleteAllAliases(cluster);
+    return solrClusterManager.deleteCollections(cluster);
   }
 
   public Response deleteCollections(String cluster, String collectionName) {
@@ -63,5 +63,9 @@ public class AdminLightningService {
 
   public Response listCollections(String cluster) {
     return solrClusterManager.getCollections(cluster);
+  }
+
+  public void refresh() {
+    solrClusterManager.reloadApp();
   }
 }

@@ -2,6 +2,8 @@ package io.github.mightguy.cloud.manager.model.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.mightguy.cloud.manager.config.AppConfig.Suffix;
+import io.github.mightguy.cloud.manager.util.Constants;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -11,6 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class InitializationRequestDetails {
 
+  @JsonProperty(Constants.INITIALIZATION_TYPE)
+  private ClusterInitializationType type;
+
   @JsonProperty("github_src")
   private GithubDetails githubDetails;
 
@@ -18,7 +23,7 @@ public class InitializationRequestDetails {
   private LocalDetails localDetails;
 
   @JsonProperty("core_details")
-  private Map<String, CoreCreationRequest> coreDetails;
+  private Map<String, CoreCreationRequest> coreDetails = new HashMap<>();
 
   @JsonProperty("cores")
   private List<String> core;

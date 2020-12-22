@@ -42,4 +42,8 @@ public class SolrAliasService {
     return new Response(HttpStatus.OK, "Alias Creation Successful",
         solrAliasManager.switchAlias(cluster, collectionName, reload));
   }
+
+  public void refresh() {
+    solrAliasManager.refresh();
+  }
 }

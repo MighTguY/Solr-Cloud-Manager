@@ -1,5 +1,6 @@
 package io.github.mightguy.cloud.manager.controller.impl;
 
+import io.github.mightguy.cloud.manager.constraints.ValidCluster;
 import io.github.mightguy.cloud.manager.controller.DataBackupController;
 import io.github.mightguy.cloud.manager.model.Response;
 import io.github.mightguy.cloud.manager.service.DataBackupService;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,9 +52,9 @@ public class DataBackupControllerImpl implements DataBackupController {
           @ApiResponse(code = 201, response = Response.class, message = "")
       })
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/backup/{cluster}/{collectionName}")
+  @PostMapping("/backup/{cluster}")
   @Override
-  public Response backupAll(@PathVariable("cluster") String cluster) {
+  public Response backupAll(@ValidCluster @PathVariable("cluster") String cluster) {
     return service.backUpAllCollection(cluster);
   }
 
@@ -73,7 +75,7 @@ public class DataBackupControllerImpl implements DataBackupController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/backup/{cluster}/{collectionName}")
   @Override
-  public Response backupCollection(@PathVariable("cluster") String cluster,
+  public Response backupCollection(@ValidCluster @PathVariable("cluster") String cluster,
       @PathVariable("collectionName") String collectionName) {
     return service.backUpCollection(cluster, collectionName);
   }
@@ -93,7 +95,7 @@ public class DataBackupControllerImpl implements DataBackupController {
       })
   @PostMapping("/restore/{cluster}/all")
   @Override
-  public Response restoreAllCollections(@PathVariable("cluster") String cluster,
+  public Response restoreAllCollections(@ValidCluster @PathVariable("cluster") String cluster,
       @RequestParam(name = "repo") String repo,
       @RequestParam(name = "delete_original", defaultValue = "false") boolean deleteOriginal,
       @RequestParam(name = "suffix", required = false, defaultValue = "restored") String suffix) {
@@ -116,7 +118,7 @@ public class DataBackupControllerImpl implements DataBackupController {
   @PostMapping("/restore/{cluster}")
   @Override
   public Response restoreCollection(
-      @PathVariable("cluster") String cluster,
+      @ValidCluster @PathVariable("cluster") String cluster,
       @RequestParam("backup_name") String backupName,
       @RequestParam(name = "repo") String repo,
       @RequestParam(name = "delete_original", defaultValue = "false") boolean deleteOriginal,
@@ -137,7 +139,7 @@ public class DataBackupControllerImpl implements DataBackupController {
       })
   @GetMapping("/{cluster}/backup")
   @Override
-  public Response listAllBackup(@PathVariable("cluster") String cluster) {
+  public Response listAllBackup(@ValidCluster @PathVariable("cluster") String cluster) {
     return service.listAllBackUp(cluster);
   }
 }

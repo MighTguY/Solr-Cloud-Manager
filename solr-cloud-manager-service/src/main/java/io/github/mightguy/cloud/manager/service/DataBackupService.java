@@ -120,4 +120,8 @@ public class DataBackupService {
     solrManagerHelper
         .restoreBackup(solrManagerContext.getSolrClient(cluster), repoPath, backupName, collName);
   }
+
+  public void refresh() {
+    solrManagerContext.reloadContext();
+  }
 }
