@@ -38,7 +38,6 @@ jobs:
     script:
     - mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -Prelease
     - mvn versions:set -DnewVersion=$NEW_VERSION-SNAPSHOT
-    - sh .travis/push.sh $GITHUB_TOKEN
 
 
 
