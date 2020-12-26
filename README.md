@@ -1,4 +1,4 @@
-![Travis Build Status](https://travis-ci.com/MighTguY/Solr-Cluster-Manager.svg?branch=master)
+![Travis Build Status](https://api.travis-ci.com/MighTguY/Solr-Cloud-Manager.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/MighTguY/Solr-Cloud-Manager/badge.svg?branch=master)](https://coveralls.io/github/MighTguY/Solr-Cloud-Manager?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/MighTguY/customized-symspell/master/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.mightguy/solr-cloud-manager.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.mightguy%22%20AND%20a:%22solr-cloud-manager%22)
