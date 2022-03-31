@@ -59,7 +59,7 @@
     <sonar.tests>src/test/java</sonar.tests>
     <solr.version>8.4.0</solr.version>
     <swagger.version>2.9.2</swagger.version>
-    <springboot.version>2.0.6.RELEASE</springboot.version>
+    <springboot.version>2.5.12</springboot.version>
     <build-helper.plugin.version>3.0.0</build-helper.plugin.version>
     <jgit.version>5.2.0.201812061821-r</jgit.version>
     <jmh.version>1.19</jmh.version>
